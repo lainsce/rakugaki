@@ -1,0 +1,11 @@
+build/
+~*
+*~
+.flatpak-builder/
+app-dir/
+debian/com.github.lainsce.rakugaki.debhelper.log
+debian/com.github.lainsce.rakugaki.substvars
+debian/com.github.lainsce.rakugaki/
+debian/debhelper-build-stamp
+debian/files
+obj-x86_64-linux-gnu/
