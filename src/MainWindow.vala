@@ -26,13 +26,13 @@ namespace Rakugaki {
         private static int uid_counter = 0;
 
         // Global Color Palette
-        public string background = "#EEEEEE";
-        public string f_high = "#000000";
-        public string f_med = "#999999";
-        public string f_low = "#CCCCCC";
-        public string f_inv = "#000000";
-        public string b_high = "#000000";
-        public string b_med = "#888888";
+        public string background = "#FCF6E1";
+        public string f_high = "#30292E";
+        public string f_med = "#90898e";
+        public string f_low = "#C0B9BEC";
+        public string f_inv = "#30292E";
+        public string b_high = "#30292E";
+        public string b_med = "#80797E";
         public string b_low = "#AAAAAA";
         public string b_inv = "#FFB545";
 
