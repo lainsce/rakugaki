@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<gresources>
-    <gresource prefix="/com/github/lainsce/rakugaki">
-        <file alias="line-thickness-symbolic.svg">icons/symbolic/line-thickness-symbolic.svg</file>
-        <file alias="grid-dots-symbolic.svg">icons/symbolic/grid-dots-symbolic.svg</file>
-    </gresource>
-</gresources>
