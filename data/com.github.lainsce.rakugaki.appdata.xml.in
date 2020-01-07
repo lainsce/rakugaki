@@ -60,9 +60,9 @@
         <content_attribute id="money-gambling">none</content_attribute>
     </content_rating>
     <releases>
-        <release version="0.0.1" date="2019-03-08">
+        <release version="1.0.0" date="2019-03-08">
             <description>
-                <p>Release: With Stereo Sound</p>
+                <p>Release: Yomikaki</p>
                 <ul>
                     <li>First stable release.</li>
                 </ul>
