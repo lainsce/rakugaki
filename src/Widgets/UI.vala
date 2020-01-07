@@ -70,16 +70,10 @@ namespace Rakugaki {
 			});
 			
 			this.motion_notify_event.connect ((e) => {
-				Gtk.Allocation allocation;
-				get_allocation (out allocation);
-				
-				double x = e.x.clamp ((double)allocation.x,(double)(allocation.x + allocation.width));
-				double y = e.y.clamp ((double)allocation.y,(double)(allocation.y + allocation.height));
-				//Point last = current_path.points.last ().data;
-				double dx = x;
-				double dy = y;
+				double dx = e.x;
+				double dy = e.y;
 				if (Math.sqrt (dx * dx + dy * dy) > 10.0) {
-					current_path.points.append (new Point (x, y));
+					current_path.points.append (new Point (e.x, e.y)); // Problematic line. Why?
 					queue_draw ();
 				}
 				return false;
