@@ -17,7 +17,7 @@ namespace Rakugaki {
 		public Path current_path = null;
 
 		private int ratio = 25;
-		public int line_thickness = 3;
+		public int line_thickness = 1;
 
 		public Gdk.RGBA line_color;
 		public Gdk.RGBA grid_main_dot_color;
@@ -26,6 +26,7 @@ namespace Rakugaki {
 
 		public bool dirty {get; set;}
 		public bool see_grid {get; set; default=true;}
+		public bool change_pen {get; set; default=false;}
 
 		public DrawingArea () {
 			add_events (Gdk.EventMask.BUTTON_PRESS_MASK |
@@ -70,9 +71,9 @@ namespace Rakugaki {
 			double y = event.y.clamp ((double)allocation.y,
 									  (double)(allocation.y + allocation.height));
 			Point last = current_path.points.last ().data;
-			double dx = x - last.x;
-			double dy = y - last.y;
-			if (Math.sqrt (dx * dx + dy * dy) > 10.0) {
+			double dx = Math.fabs(last.x - x);
+			double dy = Math.fabs(last.y - y);
+			if (Math.sqrt (dx * dx + dy * dy) > 5.0) {
 				current_path.points.append (new Point (x, y));
 				queue_draw ();
 			}
@@ -121,8 +122,32 @@ namespace Rakugaki {
 			foreach (var path in paths) {
 				Point first = path.points.first ().data;
 				cr.move_to (first.x, first.y);
+				/*
+				* Halftone-ish line type
+				*/
 				foreach (var point in path.points.next) {
-					cr.line_to (point.x, point.y);
+					if (change_pen) {
+						cr.rectangle (point.x, point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x, point.y + 6, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y + 6, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
+						cr.fill ();
+					} else {
+						cr.line_to (point.x, point.y);
+					}
 				}
 				cr.stroke ();
 			}
@@ -226,20 +251,20 @@ namespace Rakugaki {
 			line_thickness_label.margin_top = 3;
 			
 			line_thickness_button.clicked.connect ((e) => {
-				if (da.line_thickness < 30) {
+				if (da.line_thickness < 50) {
 					da.line_thickness++;
 					line_thickness_label.text = da.line_thickness.to_string ();
 					da.queue_draw ();
 				} else {
-					da.line_thickness = 3;
+					da.line_thickness = 1;
 					line_thickness_label.text = da.line_thickness.to_string ();
 					da.queue_draw ();
 				}
 			});
 			
 			line_thickness_label.changed.connect (() => {
-				if (int.parse(line_thickness_label.title.get_label ()) > 30 || int.parse(line_thickness_label.title.get_label ()) < 3) {
-					da.line_thickness = 3;
+				if (int.parse(line_thickness_label.title.get_label ()) > 50 || int.parse(line_thickness_label.title.get_label ()) < 1) {
+					da.line_thickness = 1;
 					line_thickness_label.text = da.line_thickness.to_string ();
 					da.queue_draw ();
 				} else {
@@ -254,6 +279,22 @@ namespace Rakugaki {
 			line_thickness_box.pack_start (line_thickness_label);
 			
 			actionbar.pack_start (line_thickness_box);
+
+			var pen_button = new Gtk.Button ();
+            pen_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			pen_button.has_tooltip = true;
+			pen_button.tooltip_text = (_("Change Pen Type"));
+
+			pen_button.clicked.connect ((e) => {
+				if (da.change_pen == true) {
+					da.change_pen = false;
+				} else if (da.change_pen == false) {
+					da.change_pen = true;
+				}
+				da.queue_draw ();
+            });
+
+            actionbar.pack_end (pen_button);
 			
 			var see_grid_button = new Gtk.Button ();
 			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
@@ -340,6 +381,11 @@ namespace Rakugaki {
 			} else {
 				var png = new Cairo.ImageSurface (Cairo.Format.ARGB32, da.get_allocated_width(),da.get_allocated_height());
 				Cairo.Context c = new Cairo.Context (png);
+				Gdk.RGBA background = Gdk.RGBA () {
+					red = da.background_color.red, green = da.background_color.green, blue = da.background_color.blue, alpha = da.background_color.alpha
+				};
+				Gdk.cairo_set_source_rgba (c, background);
+				c.paint ();
 				da.draws (c);
 				png.write_to_png (path + ".png");
 				file = null;
