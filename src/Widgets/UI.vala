@@ -78,6 +78,7 @@ namespace Rakugaki {
 				stroke_added (coordinates);
 	
 				current_path = null;
+
 				return false;
 			});
 	
@@ -252,6 +253,7 @@ namespace Rakugaki {
 			draw_grid (cr);
 			Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr2 = new Cairo.Context (sf2);
+			Gdk.cairo_set_source_rgba (cr2, line_color);
 			draws (cr2);
 
 			cr.set_source_surface (cr2.get_target (), 0, 0);
@@ -260,17 +262,8 @@ namespace Rakugaki {
 		}
 
 		public void draws (Cairo.Context cr) {
-			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
-			cr.set_line_width (line_thickness);
-			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
-			cr.set_line_cap (Cairo.LineCap.ROUND);
-			cr.set_line_join (Cairo.LineJoin.ROUND);
-			Gdk.RGBA foreground = Gdk.RGBA () {
-				red = line_color.red, green = line_color.green, blue = line_color.blue, alpha = line_color.alpha
-			};
-			Gdk.cairo_set_source_rgba (cr, foreground);
 			foreach (var path in paths) {
-				if (current_path.is_halftone) {
+				if (path.is_halftone) {
 					foreach (var point in path.points.next) {
 						cr.rectangle (point.x, point.y, 1, 1);
 						cr.fill ();
