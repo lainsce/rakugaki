@@ -10,9 +10,22 @@ namespace Rakugaki {
 
 	public class Path {
 		public List<Point> points = null;
+		public bool is_halftone {get; set; default=false;}
 	}
 
 	public class DrawingArea : Gtk.DrawingArea {
+		public signal void stroke_added (double[] coordinates);
+		public signal void stroke_removed (uint n_strokes);
+	}
+
+	public class Widgets.UI : Gtk.VBox {
+		public MainWindow win;
+		public signal void stroke_added (double[] coordinates);
+		public signal void stroke_removed (uint n_strokes);
+		public DrawingArea da;
+		public EditableLabel line_thickness_label;
+		public Gtk.ColorButton line_color_button;
+
 		public List<Path> paths = new List<Path> ();
 		public Path current_path = null;
 
@@ -26,162 +39,71 @@ namespace Rakugaki {
 
 		public bool dirty {get; set;}
 		public bool see_grid {get; set; default=true;}
-		public bool change_pen {get; set; default=false;}
-
-		public DrawingArea () {
-			add_events (Gdk.EventMask.BUTTON_PRESS_MASK |
-						Gdk.EventMask.BUTTON_RELEASE_MASK |
-						Gdk.EventMask.BUTTON_MOTION_MASK);
-		}
-
-		public signal void stroke_added (double[] coordinates);
-		public signal void stroke_removed (uint n_strokes);
-
-		public override bool button_press_event (Gdk.EventButton event) {
-			current_path = new Path ();
-			current_path.points.append (new Point (event.x, event.y));
-			paths.append (current_path);
-			dirty = true;
-			return false;
-		}
-
-		public override bool button_release_event (Gdk.EventButton event) {
-			// rescale coordinates against allocation box
-			Gtk.Allocation allocation;
-			get_allocation (out allocation);
-			double[] coordinates = new double[current_path.points.length () * 2];
-			// coordinates are folded in the form {x1, y1, x2, y2, ...} 
-			int i = 0;
-			foreach (var point in current_path.points) {
-				coordinates[i] = point.x / (double)allocation.width;
-				coordinates[i + 1] = point.y / (double)allocation.height;
-			}
-			stroke_added (coordinates);
-
-			current_path = null;
-			return false;
-		}
-
-		public override bool motion_notify_event (Gdk.EventMotion event) {
-			Gtk.Allocation allocation;
-			get_allocation (out allocation);
-
-			double x = event.x.clamp ((double)allocation.x,
-									  (double)(allocation.x + allocation.width));
-			double y = event.y.clamp ((double)allocation.y,
-									  (double)(allocation.y + allocation.height));
-			Point last = current_path.points.last ().data;
-			double dx = Math.fabs(last.x - x);
-			double dy = Math.fabs(last.y - y);
-			if (Math.sqrt (dx * dx + dy * dy) > 5.0) {
-				current_path.points.append (new Point (x, y));
-				queue_draw ();
-			}
-			return false;
-		}
-
-		public override bool draw (Cairo.Context cr) {
-			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
-
-			draw_grid (cr);
-			draws (cr);
-			return false;
-		}
-
-		private void draw_grid (Cairo.Context c) {
-			if (see_grid == true) {
-				int i, j;
-				int h = this.get_allocated_height ();
-				int w = this.get_allocated_width ();
-				c.set_line_width (1);
-				for (i = 0; i <= w / ratio; i++) {
-					for (j = 0; j <= h / ratio; j++) {
-						if (i % 4 == 0 && j % 4 == 0) {
-							c.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
-							c.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
-							c.fill ();
-						} else {
-							c.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
-							c.arc ((i+1)*ratio, (j+1)*ratio, 1.0, 0, 2*Math.PI);
-							c.fill ();
-						}
-					}
-				}
-			}
-		}
-
-		public void draws (Cairo.Context cr) {
-			cr.set_line_width (line_thickness);
-			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
-			cr.set_line_cap (Cairo.LineCap.ROUND);
-			cr.set_line_join (Cairo.LineJoin.ROUND);
-			Gdk.RGBA foreground = Gdk.RGBA () {
-				red = line_color.red, green = line_color.green, blue = line_color.blue, alpha = line_color.alpha
-			};
-			Gdk.cairo_set_source_rgba (cr, foreground);
-			foreach (var path in paths) {
-				Point first = path.points.first ().data;
-				cr.move_to (first.x, first.y);
-				/*
-				* Halftone-ish line type
-				*/
-				foreach (var point in path.points.next) {
-					if (change_pen) {
-						cr.rectangle (point.x, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x, point.y + 3, 1.5, 1.5);
-						cr.fill ();
-						cr.rectangle (point.x, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y, 1.5, 1.5);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y + 3, 1.5, 1.5);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y + 6, 1.5, 1.5);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y + 3, 1.5, 1.5);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
-						cr.fill ();
-					} else {
-						cr.line_to (point.x, point.y);
-					}
-				}
-				cr.stroke ();
-			}
-		}
-
-		public void undo () {
-			if (paths != null) {
-				unowned List<Path> last = paths.last ();
-				unowned List<Path> prev = last.prev;
-				paths.delete_link (last);
-				if (current_path != null) {
-					if (prev != null)
-					current_path = prev.data;
-					else
-					current_path = null;
-				}
-				queue_draw ();
-			}
-		}
-	}
-
-	public class Widgets.UI : Gtk.VBox {
-		public MainWindow win;
-		public signal void stroke_added (double[] coordinates);
-		public signal void stroke_removed (uint n_strokes);
-		public DrawingArea da;
-		public EditableLabel line_thickness_label;
-		public Gtk.ColorButton line_color_button;
-
+		public bool halftone {get; set; default=false;}
 
 		public UI (MainWindow win) {
 			this.win = win;
 
 			da = new DrawingArea ();
+
+			da.add_events (Gdk.EventMask.BUTTON_PRESS_MASK |
+						   Gdk.EventMask.BUTTON_RELEASE_MASK |
+						   Gdk.EventMask.BUTTON_MOTION_MASK);
+
+			da.button_press_event.connect ((e) => {
+				if (halftone) {
+					current_path = new Path ();
+					current_path.is_halftone = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				} else {
+					current_path = new Path ();
+					current_path.is_halftone = false;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
+				dirty = true;
+				return false;
+			});
+	
+			da.button_release_event.connect ((e) => {
+				Gtk.Allocation allocation;
+				get_allocation (out allocation);
+				double[] coordinates = new double[current_path.points.length () * 2];
+				int i = 0;
+				foreach (var point in current_path.points) {
+					coordinates[i] = point.x / (double)allocation.width;
+					coordinates[i + 1] = point.y / (double)allocation.height;
+				}
+				stroke_added (coordinates);
+	
+				current_path = null;
+
+				return false;
+			});
+	
+			da.motion_notify_event.connect ((e) => {
+				Gtk.Allocation allocation;
+				get_allocation (out allocation);
+	
+				double x = e.x.clamp ((double)allocation.x,
+										  (double)(allocation.x + allocation.width));
+				double y = e.y.clamp ((double)allocation.y,
+										  (double)(allocation.y + allocation.height));
+				Point last = current_path.points.last ().data;
+				double dx = Math.fabs(last.x - x);
+				double dy = Math.fabs(last.y - y);
+				if (Math.sqrt (dx * dx + dy * dy) > 3.0) {
+					current_path.points.append (new Point (x, y));
+					da.queue_draw ();
+				}
+				return false;
+			});
+	
+			da.draw.connect ((c) => {
+				main_draw (c);
+				return false;
+			});
 
 			var actionbar = new Gtk.ActionBar ();
 			actionbar.get_style_context ().add_class ("dm-actionbar");
@@ -218,8 +140,8 @@ namespace Rakugaki {
 			undo_button.tooltip_text = (_("Undo Last Line"));
 			
 			undo_button.clicked.connect ((e) => {
-				da.undo ();
-				da.current_path = new Path ();
+				undo ();
+				current_path = new Path ();
 				da.queue_draw ();
 			});
 			
@@ -236,7 +158,7 @@ namespace Rakugaki {
 			actionbar.pack_start (line_color_button);
 			
 			line_color_button.color_set.connect ((e) => {
-				da.line_color = line_color_button.rgba;
+				line_color = line_color_button.rgba;
 				da.queue_draw ();
 			});
 			
@@ -244,32 +166,32 @@ namespace Rakugaki {
 			line_thickness_button.set_image (new Gtk.Image.from_icon_name ("line-thickness-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			line_thickness_button.has_tooltip = true;
 			line_thickness_button.tooltip_text = (_("Change Line Thickness"));
-			line_thickness_label = new EditableLabel (da.line_thickness.to_string());
+			line_thickness_label = new EditableLabel (line_thickness.to_string());
 			line_thickness_label.get_style_context ().add_class ("dm-text");
 			line_thickness_label.valign = Gtk.Align.CENTER;
 			line_thickness_label.hexpand = false;
 			line_thickness_label.margin_top = 3;
 			
 			line_thickness_button.clicked.connect ((e) => {
-				if (da.line_thickness < 50) {
-					da.line_thickness++;
-					line_thickness_label.text = da.line_thickness.to_string ();
+				if (line_thickness < 50) {
+					line_thickness++;
+					line_thickness_label.text = line_thickness.to_string ();
 					da.queue_draw ();
 				} else {
-					da.line_thickness = 1;
-					line_thickness_label.text = da.line_thickness.to_string ();
+					line_thickness = 1;
+					line_thickness_label.text = line_thickness.to_string ();
 					da.queue_draw ();
 				}
 			});
 			
 			line_thickness_label.changed.connect (() => {
 				if (int.parse(line_thickness_label.title.get_label ()) > 50 || int.parse(line_thickness_label.title.get_label ()) < 1) {
-					da.line_thickness = 1;
-					line_thickness_label.text = da.line_thickness.to_string ();
+					line_thickness = 1;
+					line_thickness_label.text = line_thickness.to_string ();
 					da.queue_draw ();
 				} else {
-					da.line_thickness = int.parse(line_thickness_label.title.get_label ());
-					line_thickness_label.text = da.line_thickness.to_string ();
+					line_thickness = int.parse(line_thickness_label.title.get_label ());
+					line_thickness_label.text = line_thickness.to_string ();
 					da.queue_draw ();
 				}
 			});
@@ -279,22 +201,21 @@ namespace Rakugaki {
 			line_thickness_box.pack_start (line_thickness_label);
 			
 			actionbar.pack_start (line_thickness_box);
+			
+			var halftone_button = new Gtk.Button ();
+            halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			halftone_button.has_tooltip = true;
+			halftone_button.tooltip_text = (_("Change Pen Type"));
 
-			var pen_button = new Gtk.Button ();
-            pen_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			pen_button.has_tooltip = true;
-			pen_button.tooltip_text = (_("Change Pen Type"));
-
-			pen_button.clicked.connect ((e) => {
-				if (da.change_pen == true) {
-					da.change_pen = false;
-				} else if (da.change_pen == false) {
-					da.change_pen = true;
+			halftone_button.clicked.connect ((e) => {
+				if (halftone) {
+					halftone = false;
+				} else {
+					halftone = true;
 				}
-				da.queue_draw ();
             });
 
-            actionbar.pack_end (pen_button);
+            actionbar.pack_end (halftone_button);
 			
 			var see_grid_button = new Gtk.Button ();
 			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
@@ -302,10 +223,10 @@ namespace Rakugaki {
 			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
 			
 			see_grid_button.clicked.connect ((e) => {
-				if (da.see_grid == true) {
-					da.see_grid = false;
-				} else if (da.see_grid == false) {
-					da.see_grid = true;
+				if (see_grid == true) {
+					see_grid = false;
+				} else if (see_grid == false) {
+					see_grid = true;
 				}
 				da.queue_draw ();
 			});
@@ -326,6 +247,82 @@ namespace Rakugaki {
 				});
 		}
 
+		public void main_draw (Cairo.Context cr) {
+			Gtk.Allocation allocation;
+			get_allocation (out allocation);
+			draw_grid (cr);
+			Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
+			Cairo.Context cr2 = new Cairo.Context (sf2);
+			Gdk.cairo_set_source_rgba (cr2, line_color);
+			draws (cr2);
+
+			cr.set_source_surface (cr2.get_target (), 0, 0);
+			cr.rectangle (0, 0, allocation.width, allocation.height);
+			cr.paint ();
+		}
+
+		public void draws (Cairo.Context cr) {
+			foreach (var path in paths) {
+				if (path.is_halftone) {
+					foreach (var point in path.points.next) {
+						cr.rectangle (point.x, point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x, point.y + 6, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 3, point.y + 6, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y + 3, 1.5, 1.5);
+						cr.fill ();
+						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
+						cr.fill ();
+					}
+					cr.stroke ();
+				} else {
+					Point first = path.points.first ().data;
+					cr.move_to (first.x, first.y);
+					foreach (var point in path.points.next) {
+						cr.line_to (point.x, point.y);
+					}
+					cr.stroke ();
+				}
+			}
+		}
+
+		private void draw_grid (Cairo.Context cr) {
+			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
+			cr.set_line_width (1);
+			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
+			cr.set_line_cap (Cairo.LineCap.ROUND);
+			cr.set_line_join (Cairo.LineJoin.ROUND);
+			if (see_grid == true) {
+				int i, j;
+				int h = this.get_allocated_height ();
+				int w = this.get_allocated_width ();
+
+				for (i = 0; i <= w / ratio; i++) {
+					for (j = 0; j <= h / ratio; j++) {
+						if (i % 4 == 0 && j % 4 == 0) {
+							cr.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
+							cr.fill ();
+						} else {
+							cr.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.0, 0, 2*Math.PI);
+							cr.fill ();
+						}
+					}
+				}
+			}
+		}
+
 		// IO Section
 		private void clear () {
 			var dialog = new Dialog ();
@@ -340,16 +337,16 @@ namespace Rakugaki {
 						} catch (Error e) {
 							warning ("Unexpected error during save: " + e.message);
 						}
-						da.paths = null;
-						da.current_path = new Path ();
+						paths = null;
+						current_path = new Path ();
 						da.queue_draw ();
-						da.dirty = false;
+						dirty = false;
 						stroke_removed (0);
 						dialog.close ();
 						break;
 					case Gtk.ResponseType.NO:
-						da.paths = null;
-						da.current_path = new Path ();
+						paths = null;
+						current_path = new Path ();
 						da.queue_draw ();
 						stroke_removed (0);
 						dialog.close ();
@@ -365,8 +362,23 @@ namespace Rakugaki {
 			});
 
 
-			if (da.dirty == true) {
+			if (dirty == true) {
 				dialog.run ();
+			}
+		}
+
+		public void undo () {
+			if (paths != null) {
+				unowned List<Path> last = paths.last ();
+				unowned List<Path> prev = last.prev;
+				paths.delete_link (last);
+				if (current_path != null) {
+					if (prev != null)
+					current_path = prev.data;
+					else
+					current_path = null;
+				}
+				da.queue_draw ();
 			}
 		}
 
@@ -382,11 +394,11 @@ namespace Rakugaki {
 				var png = new Cairo.ImageSurface (Cairo.Format.ARGB32, da.get_allocated_width(),da.get_allocated_height());
 				Cairo.Context c = new Cairo.Context (png);
 				Gdk.RGBA background = Gdk.RGBA () {
-					red = da.background_color.red, green = da.background_color.green, blue = da.background_color.blue, alpha = da.background_color.alpha
+					red = background_color.red, green = background_color.green, blue = background_color.blue, alpha = background_color.alpha
 				};
 				Gdk.cairo_set_source_rgba (c, background);
 				c.paint ();
-				da.draws (c);
+				//da.draws (c);
 				png.write_to_png (path + ".png");
 				file = null;
 			}

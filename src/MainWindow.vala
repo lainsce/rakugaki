@@ -59,8 +59,8 @@ namespace Rakugaki {
                     }
 
                     if (match_keycode (Gdk.Key.z, keycode)) {
-                        ui.da.undo ();
-                        ui.da.current_path = new Path ();
+                        ui.undo ();
+                        ui.current_path = new Path ();
 				        ui.da.queue_draw ();
                     }
                 }
@@ -168,11 +168,11 @@ namespace Rakugaki {
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
-            ui.da.line_color.parse (this.f_high);
-            ui.da.grid_main_dot_color.parse (this.b_med);
-			ui.da.grid_dot_color.parse (this.b_low);
-			ui.da.background_color.parse (this.background);
-			ui.line_color_button.rgba = ui.da.line_color;
+            ui.line_color.parse (this.f_high);
+            ui.grid_main_dot_color.parse (this.b_med);
+			ui.grid_dot_color.parse (this.b_low);
+			ui.background_color.parse (this.background);
+			ui.line_color_button.rgba = ui.line_color;
             scrolled.add (ui);
             scrolled.expand = true;
 
@@ -320,11 +320,11 @@ namespace Rakugaki {
                         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
                     } catch {}
 
-                    ui.da.line_color.parse (this.f_high);
-                    ui.da.grid_main_dot_color.parse (this.b_med);
-			        ui.da.grid_dot_color.parse (this.b_low);
-			        ui.da.background_color.parse (this.background);
-			        ui.line_color_button.rgba = ui.da.line_color;
+                    ui.line_color.parse (this.f_high);
+                    ui.grid_main_dot_color.parse (this.b_med);
+			        ui.grid_dot_color.parse (this.b_low);
+			        ui.background_color.parse (this.background);
+			        ui.line_color_button.rgba = ui.line_color;
 
                     print ("Setupped colors from file.\n");
                 }
