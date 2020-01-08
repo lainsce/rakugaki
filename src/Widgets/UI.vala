@@ -10,6 +10,7 @@ namespace Rakugaki {
 
 	public class Path {
 		public List<Point> points = null;
+		public bool is_halftone {get; set; default=false;}
 	}
 
 	public class DrawingArea : Gtk.DrawingArea {
@@ -46,11 +47,9 @@ namespace Rakugaki {
 		}
 
 		public override bool button_release_event (Gdk.EventButton event) {
-			// rescale coordinates against allocation box
 			Gtk.Allocation allocation;
 			get_allocation (out allocation);
 			double[] coordinates = new double[current_path.points.length () * 2];
-			// coordinates are folded in the form {x1, y1, x2, y2, ...} 
 			int i = 0;
 			foreach (var point in current_path.points) {
 				coordinates[i] = point.x / (double)allocation.width;
@@ -73,7 +72,7 @@ namespace Rakugaki {
 			Point last = current_path.points.last ().data;
 			double dx = Math.fabs(last.x - x);
 			double dy = Math.fabs(last.y - y);
-			if (Math.sqrt (dx * dx + dy * dy) > 5.0) {
+			if (Math.sqrt (dx * dx + dy * dy) > 3.0) {
 				current_path.points.append (new Point (x, y));
 				queue_draw ();
 			}
@@ -81,36 +80,13 @@ namespace Rakugaki {
 		}
 
 		public override bool draw (Cairo.Context cr) {
-			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
-
 			draw_grid (cr);
 			draws (cr);
 			return false;
 		}
 
-		private void draw_grid (Cairo.Context c) {
-			if (see_grid == true) {
-				int i, j;
-				int h = this.get_allocated_height ();
-				int w = this.get_allocated_width ();
-				c.set_line_width (1);
-				for (i = 0; i <= w / ratio; i++) {
-					for (j = 0; j <= h / ratio; j++) {
-						if (i % 4 == 0 && j % 4 == 0) {
-							c.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
-							c.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
-							c.fill ();
-						} else {
-							c.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
-							c.arc ((i+1)*ratio, (j+1)*ratio, 1.0, 0, 2*Math.PI);
-							c.fill ();
-						}
-					}
-				}
-			}
-		}
-
 		public void draws (Cairo.Context cr) {
+			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
 			cr.set_line_width (line_thickness);
 			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
 			cr.set_line_cap (Cairo.LineCap.ROUND);
@@ -127,6 +103,7 @@ namespace Rakugaki {
 				*/
 				foreach (var point in path.points.next) {
 					if (change_pen) {
+						path.is_halftone = true;
 						cr.rectangle (point.x, point.y, 1, 1);
 						cr.fill ();
 						cr.rectangle (point.x, point.y + 3, 1.5, 1.5);
@@ -146,10 +123,38 @@ namespace Rakugaki {
 						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
 						cr.fill ();
 					} else {
+						path.is_halftone = false;
 						cr.line_to (point.x, point.y);
 					}
 				}
 				cr.stroke ();
+			}
+		}
+
+		private void draw_grid (Cairo.Context cr) {
+			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
+			cr.set_line_width (1);
+			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
+			cr.set_line_cap (Cairo.LineCap.ROUND);
+			cr.set_line_join (Cairo.LineJoin.ROUND);
+			if (see_grid == true) {
+				int i, j;
+				int h = this.get_allocated_height ();
+				int w = this.get_allocated_width ();
+
+				for (i = 0; i <= w / ratio; i++) {
+					for (j = 0; j <= h / ratio; j++) {
+						if (i % 4 == 0 && j % 4 == 0) {
+							cr.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
+							cr.fill ();
+						} else {
+							cr.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.0, 0, 2*Math.PI);
+							cr.fill ();
+						}
+					}
+				}
 			}
 		}
 
@@ -286,12 +291,16 @@ namespace Rakugaki {
 			pen_button.tooltip_text = (_("Change Pen Type"));
 
 			pen_button.clicked.connect ((e) => {
+				var path = new Path ();
 				if (da.change_pen == true) {
 					da.change_pen = false;
+					path.is_halftone = false;
+					da.queue_draw ();
 				} else if (da.change_pen == false) {
 					da.change_pen = true;
+					path.is_halftone = true;
+					da.queue_draw ();
 				}
-				da.queue_draw ();
             });
 
             actionbar.pack_end (pen_button);
@@ -386,7 +395,7 @@ namespace Rakugaki {
 				};
 				Gdk.cairo_set_source_rgba (c, background);
 				c.paint ();
-				da.draws (c);
+				//da.draws (c);
 				png.write_to_png (path + ".png");
 				file = null;
 			}
