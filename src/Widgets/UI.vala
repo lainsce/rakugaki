@@ -262,8 +262,13 @@ namespace Rakugaki {
 		}
 
 		public void draws (Cairo.Context cr) {
+			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
+			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
+			cr.set_line_cap (Cairo.LineCap.ROUND);
+			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
+					cr.set_line_width (9);
 					foreach (var point in path.points.next) {
 						cr.rectangle (point.x, point.y, 1, 1);
 						cr.fill ();
@@ -286,6 +291,7 @@ namespace Rakugaki {
 					}
 					cr.stroke ();
 				} else {
+					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
 					foreach (var point in path.points.next) {
