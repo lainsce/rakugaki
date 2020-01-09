@@ -391,6 +391,8 @@ namespace Rakugaki {
 			if (file == null) {
 				debug ("User cancelled operation. Aborting.");
 			} else {
+				Gtk.Allocation allocation;
+				get_allocation (out allocation);
 				var png = new Cairo.ImageSurface (Cairo.Format.ARGB32, da.get_allocated_width(),da.get_allocated_height());
 				Cairo.Context c = new Cairo.Context (png);
 				Gdk.RGBA background = Gdk.RGBA () {
@@ -398,7 +400,14 @@ namespace Rakugaki {
 				};
 				Gdk.cairo_set_source_rgba (c, background);
 				c.paint ();
-				//da.draws (c);
+				Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
+				Cairo.Context cr2 = new Cairo.Context (sf2);
+				Gdk.cairo_set_source_rgba (cr2, line_color);
+				draws (cr2);
+	
+				c.set_source_surface (cr2.get_target (), 0, 0);
+				c.rectangle (0, 0, allocation.width, allocation.height);
+				c.paint ();
 				png.write_to_png (path + ".png");
 				file = null;
 			}
