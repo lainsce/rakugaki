@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.lainsce.rakugaki', ['vala', 'c'],
-    version: '1.0.2'
+    version: '1.0.3'
 )
 
 # Import main lib files

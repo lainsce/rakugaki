@@ -16,9 +16,15 @@
  */
 
 namespace Rakugaki {
-    public class AppSettings : Granite.Services.Settings {
-        public int window_x { get; set; }
-        public int window_y { get; set; }
+    public class AppSettings : GLib.Settings {
+        public int window_x { 
+            get { return get_int ("window-x"); }
+            set { set_int ("window-x", value); }
+        }
+        public int window_y { 
+            get { return get_int ("window-y"); }
+            set { set_int ("window-y", value); }
+        }
 
         private static AppSettings? instance;
         public static unowned AppSettings get_default () {
@@ -29,8 +35,8 @@ namespace Rakugaki {
             return instance;
         }
 
-        private AppSettings () {
-            base ("com.github.lainsce.rakugaki");
+        public AppSettings () {
+            Object (schema_id: "com.github.lainsce.rakugaki");
         }
     }
 }
