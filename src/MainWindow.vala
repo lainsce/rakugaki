@@ -69,79 +69,79 @@ namespace Rakugaki {
 
             this.uid = uid_counter++;
             string css_light = """
-                        @define-color colorPrimary %s;
-                        @define-color colorSecondary %s;
-                        @define-color colorAccent %s;
-                        @define-color windowPrimary %s;
-                        @define-color textColorPrimary %s;
-                        @define-color textColorSecondary %s;
-                        @define-color iconColorPrimary %s;
+                @define-color colorPrimary %s;
+                @define-color colorSecondary %s;
+                @define-color colorAccent %s;
+                @define-color windowPrimary %s;
+                @define-color textColorPrimary %s;
+                @define-color textColorSecondary %s;
+                @define-color iconColorPrimary %s;
 
-                        .dm-window {
-                            background: @colorPrimary;
-                            color: @textColorPrimary;
-                        }
+                .dm-window {
+                    background: @colorPrimary;
+                    color: @textColorPrimary;
+                }
 
-                        .dm-toolbar {
-                            background: @colorPrimary;
-                            color: @windowPrimary;
-                            box-shadow: 0 1px transparent inset;
-                        }
+                .dm-toolbar {
+                    background: @colorPrimary;
+                    color: @windowPrimary;
+                    box-shadow: 0 1px transparent inset;
+                }
 
-                        .dm-actionbar {
-                            background: @colorPrimary;
-                            box-shadow: 0 1px transparent inset;
-                            color: @textColorSecondary;
-                            padding: 8px;
-                            border-top: 1px solid alpha (@textColorPrimary, 0);
-                        }
+                .dm-actionbar {
+                    background: @colorPrimary;
+                    box-shadow: 0 1px transparent inset;
+                    color: @textColorSecondary;
+                    padding: 8px;
+                    border-top: 1px solid alpha (@textColorPrimary, 0);
+                }
 
-                        .dm-actionbar image {
-                            color: alpha (@iconColorPrimary, 0.4);
-                            -gtk-icon-shadow: none;
-                        }
+                .dm-actionbar image {
+                    color: alpha (@iconColorPrimary, 0.4);
+                    -gtk-icon-shadow: none;
+                }
 
-                        .dm-actionbar button:hover image {
-                            color: @iconColorPrimary;
-                        }
+                .dm-actionbar button:hover image {
+                    color: @iconColorPrimary;
+                }
 
-                        .dm-actionbar button:active image {
-                            color: @iconColorPrimary;
-                        }
+                .dm-actionbar button:active image {
+                    color: @iconColorPrimary;
+                }
 
-                        .dm-reverse image {
-                            -gtk-icon-transform: rotate(180deg);
-                        }
+                .dm-reverse image {
+                    -gtk-icon-transform: rotate(180deg);
+                }
 
-                        .dm-grid {
-                            background: @colorPrimary;
-                        }
+                .dm-grid {
+                    background: @colorPrimary;
+                }
 
-                        .dm-text {
-                            font-family: 'Cousine', Courier, monospace;
-                            font-size: 1.66em;
-                        }
+                .dm-text {
+                    font-family: 'Cousine', Courier, monospace;
+                    font-size: 1.66em;
+                }
 
-                        .dm-clrbtn {
-                            background: @colorPrimary;
-                            color: @textColorPrimary;
-                            box-shadow: 0 1px transparent inset;
-                            border: none;
-                        }
+                .dm-clrbtn {
+                    background: @colorPrimary;
+                    color: @textColorPrimary;
+                    box-shadow: 0 1px transparent inset;
+                    border: none;
+                }
 
-                        .dm-clrbtn:active {
-                            background: @colorAccent;
-                        }
+                .dm-clrbtn:active {
+                    background: @colorAccent;
+                }
 
-                        .dm-clrbtn colorswatch {
-                            border-radius: 8px;
-                        }
-                    """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.b_high, this.f_high);
-                    try {
-                        var provider = new Gtk.CssProvider ();
-                        provider.load_from_data (css_light, -1);
-                        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-                    } catch {}
+                .dm-clrbtn colorswatch {
+                    border-radius: 8px;
+                }
+            """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.b_high, this.f_high);
+            try {
+                var provider = new Gtk.CssProvider ();
+                provider.load_from_data (css_light, -1);
+                Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            } catch {}
         }
 
         construct {

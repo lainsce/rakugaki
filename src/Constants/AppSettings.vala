@@ -35,7 +35,7 @@ namespace Rakugaki {
             return instance;
         }
 
-        public AppSettings () {
+        private AppSettings () {
             Object (schema_id: "com.github.lainsce.rakugaki");
         }
     }
