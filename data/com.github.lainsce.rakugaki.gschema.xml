@@ -10,5 +10,10 @@
 			<summary>Window position</summary>
 			<description>The y axis of window position</description>
 		</key>
+		<key name="window-maximize" type="b">
+			<default>false</default>
+			<summary>Window maximize status</summary>
+			<description>The state of window maximization</description>
+		</key>
 	</schema>
 </schemalist>

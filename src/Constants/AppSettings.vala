@@ -25,6 +25,10 @@ namespace Rakugaki {
             get { return get_int ("window-y"); }
             set { set_int ("window-y", value); }
         }
+        public bool window_maximize { 
+            get { return get_boolean ("window-maximize"); }
+            set { set_boolean ("window-maximize", value); }
+        }
 
         private static AppSettings? instance;
         public static unowned AppSettings get_default () {

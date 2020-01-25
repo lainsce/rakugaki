@@ -151,6 +151,11 @@ namespace Rakugaki {
             if (x != -1 && y != -1) {
                 this.move (x, y);
             }
+            if (settings.window_maximize) {
+                this.maximize ();
+            } else {
+                this.unmaximize ();
+            }
 
             this.get_style_context ().add_class ("rounded");
             this.get_style_context ().add_class ("dm-window");
@@ -357,6 +362,7 @@ namespace Rakugaki {
             var settings = AppSettings.get_default ();
             settings.window_x = x;
             settings.window_y = y;
+            settings.window_maximize = is_maximized;
             return false;
         }
     }

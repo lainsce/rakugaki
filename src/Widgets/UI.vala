@@ -11,6 +11,7 @@ namespace Rakugaki {
 	public class Path {
 		public List<Point> points = null;
 		public bool is_halftone {get; set; default=false;}
+		public bool is_eraser {get; set; default=false;}
 	}
 
 	public class DrawingArea : Gtk.DrawingArea {
@@ -40,6 +41,7 @@ namespace Rakugaki {
 		public bool dirty {get; set;}
 		public bool see_grid {get; set; default=true;}
 		public bool halftone {get; set; default=false;}
+		public bool eraser {get; set; default=false;}
 
 		public UI (MainWindow win) {
 			this.win = win;
@@ -56,7 +58,14 @@ namespace Rakugaki {
 					current_path.is_halftone = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
-				} else {
+				}
+				if (eraser) {
+					current_path = new Path ();
+					current_path.is_eraser = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
+				if (!halftone && !eraser) {
 					current_path = new Path ();
 					current_path.is_halftone = false;
 					current_path.points.append (new Point (e.x, e.y));
@@ -93,7 +102,7 @@ namespace Rakugaki {
 				Point last = current_path.points.last ().data;
 				double dx = Math.fabs(last.x - x);
 				double dy = Math.fabs(last.y - y);
-				if (Math.sqrt (dx * dx + dy * dy) > 3.0) {
+				if (Math.sqrt (dx * dx + dy * dy) > 5.0) {
 					current_path.points.append (new Point (x, y));
 					da.queue_draw ();
 				}
@@ -208,6 +217,7 @@ namespace Rakugaki {
 			halftone_button.tooltip_text = (_("Change Pen Type"));
 
 			halftone_button.clicked.connect ((e) => {
+				eraser = false;
 				if (halftone) {
 					halftone = false;
 				} else {
@@ -215,7 +225,23 @@ namespace Rakugaki {
 				}
             });
 
-            actionbar.pack_end (halftone_button);
+			actionbar.pack_end (halftone_button);
+			
+			var eraser_button = new Gtk.Button ();
+            eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			eraser_button.has_tooltip = true;
+			eraser_button.tooltip_text = (_("Eraser"));
+
+			eraser_button.clicked.connect ((e) => {
+				halftone = false;
+				if (eraser) {
+					eraser = false;
+				} else {
+					eraser = true;
+				}
+            });
+
+            actionbar.pack_end (eraser_button);
 			
 			var see_grid_button = new Gtk.Button ();
 			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
@@ -250,13 +276,18 @@ namespace Rakugaki {
 		public void main_draw (Cairo.Context cr) {
 			Gtk.Allocation allocation;
 			get_allocation (out allocation);
-			draw_grid (cr);
 			Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr2 = new Cairo.Context (sf2);
-			Gdk.cairo_set_source_rgba (cr2, line_color);
 			draws (cr2);
 
+			Cairo.ImageSurface sf3 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
+			Cairo.Context cr3 = new Cairo.Context (sf3);
+			draw_grid (cr3);
+
 			cr.set_source_surface (cr2.get_target (), 0, 0);
+			cr.rectangle (0, 0, allocation.width, allocation.height);
+			cr.paint ();
+			cr.set_source_surface (cr3.get_target (), 0, 0);
 			cr.rectangle (0, 0, allocation.width, allocation.height);
 			cr.paint ();
 		}
@@ -268,6 +299,7 @@ namespace Rakugaki {
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
+					Gdk.cairo_set_source_rgba (cr, line_color);
 					cr.set_line_width (9);
 					foreach (var point in path.points.next) {
 						cr.rectangle (point.x, point.y, 1, 1);
@@ -290,7 +322,19 @@ namespace Rakugaki {
 						cr.fill ();
 					}
 					cr.stroke ();
-				} else {
+				}
+				if (path.is_eraser) {
+					Gdk.cairo_set_source_rgba (cr, background_color);
+					cr.set_line_width (9);
+					Point first = path.points.first ().data;
+					cr.move_to (first.x, first.y);
+					foreach (var point in path.points.next) {
+						cr.line_to (point.x, point.y);
+					}
+					cr.stroke ();
+				}
+				if (!path.is_eraser && !path.is_halftone) {
+					Gdk.cairo_set_source_rgba (cr, line_color);
 					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
