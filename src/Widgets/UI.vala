@@ -102,10 +102,22 @@ namespace Rakugaki {
 				Point last = current_path.points.last ().data;
 				double dx = Math.fabs(last.x - x);
 				double dy = Math.fabs(last.y - y);
-				if (Math.sqrt (dx * dx + dy * dy) > 5.0) {
+
+				// Thanks Neauoire! =)
+				double err = dx + dy;
+				double e2 = 2 * err;
+				if (e2 >= dy) {
+					err += dy; x += (x < last.x ? 1 : -1);
 					current_path.points.append (new Point (x, y));
-					da.queue_draw ();
 				}
+      			if (e2 <= dx) {
+					err += dx; y += (y < last.y ? 1 : -1);
+					current_path.points.append (new Point (x, y));
+				}
+				//
+
+				da.queue_draw ();
+
 				return false;
 			});
 	
