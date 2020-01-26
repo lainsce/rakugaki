@@ -66,6 +66,7 @@
                 <p>Release: Asa</p>
                 <ul>
                     <li>Fixed: Line smoothing.</li>
+                    <li>Fixed: Halftone.</li>
                 </ul>
             </description>
         </release>
