@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Rakugaki
-Comment=Want to just draw, sketch or doodle?\nThis is the tool for you!
+Comment=Draw, sketch or doodle
 Exec=com.github.lainsce.rakugaki
 Icon=com.github.lainsce.rakugaki
 Keywords=Raster;Drawing;
