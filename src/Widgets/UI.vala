@@ -544,9 +544,11 @@ namespace Rakugaki {
 			);
 		}
 		construct {
-			var save = add_button (_("Save"), Gtk.ResponseType.OK);
 			var cws = add_button (_("Close Without Saving"), Gtk.ResponseType.NO);
+			cws.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
 			var cancel = add_button (_("Cancel"), Gtk.ResponseType.CANCEL) as Gtk.Button;
+			var save = add_button (_("Save"), Gtk.ResponseType.OK);
+			save.has_focus = true;
 			cancel.clicked.connect (() => { destroy (); });
 		}
 	}
