@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: extra\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-09 10:37-0300\n"
+"POT-Creation-Date: 2020-01-30 08:05+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,88 +17,123 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:6
-#: data/com.github.lainsce.dot-matrix.desktop.in:3
-msgid "Dot Matrix"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:6
+#: data/com.github.lainsce.rakugaki.desktop.in:3
+msgid "Rakugaki"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:7
-#: data/com.github.lainsce.dot-matrix.desktop.in:4
-msgid "The glyph playground of creativity from simple lines"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:7
+msgid "Want to just draw, sketch or doodle? This is the tool for you."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:9
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:9
 msgid ""
-"Make out icons, glyphs, or anything you can create with lines in this grid "
-"of dots"
+"Draw to your heart's content with this simple, no-friction, no excessive "
+"chrome, pad."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:11
-msgid "Select whetether to draw with lines or curves."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:11
+msgid "Use half-toned strokes with Ctrl + 1"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:12
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:12
 msgid "Quit anytime with the shortcut Ctrl + Q"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:13
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:13
 msgid "Undo with the shortcut Ctrl + Z"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:14
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:14
 msgid ""
 "Change line thickness by +5 or -5 with the respective shortcuts Ctrl + ) and "
 "Ctrl + ("
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:20
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:15
+msgid "Change the UI colors by using the special Ecosystem SVGs"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:21
 msgid "Lains"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:60
-msgid "Release: French Horns"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:26
+msgid "Normal Colors"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:62
-msgid "Added: French translations (NathanBnm)"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:30
+msgid "With Ecosystem Colors"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:68
-msgid "Release: Unto The Rocks"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:66
+msgid "Release: Asa"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:70
-msgid "Added: Mouse cursor."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:68
+msgid "Fixed: Line smoothing."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:71
-msgid "Added: Undo function button."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:69
+msgid "Fixed: Halftone."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:72
-msgid "Added: Show/Hide Grid function button."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:75
+msgid "Release: Ongaku"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:73
-msgid "Added: Undo and line thickness keybinds."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:77
+msgid "Added: Eraser function"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:74
-msgid "Misc: Bumped the line thickness limit to 50."
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:78
+msgid "Fixed: Grid should be a guide, so it is top-most."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:80
-msgid "Release: With Stereo Sound"
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:79
+msgid "And other small changes."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.appdata.xml.in:82
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:85
+msgid "Release: Yoru"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:87
+msgid "Fixed: Minor backend fixes"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:93
+msgid "Release: Hikaru"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:95
+msgid "Added: Half-tone drawing"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:96
+msgid "Fixed: Saving images with background"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:102
+msgid "Release: Yomikaki"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:104
 msgid "First stable release."
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.desktop.in:6
-msgid "com.github.lainsce.dot-matrix"
+#: data/com.github.lainsce.rakugaki.desktop.in:4
+msgid "Drawing Tool"
 msgstr ""
 
-#: data/com.github.lainsce.dot-matrix.desktop.in:7
-msgid "Matrix;Vector;Drawing;Grid;"
+#: data/com.github.lainsce.rakugaki.desktop.in:5
+msgid "Draw, sketch or doodle"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.desktop.in:7
+msgid "com.github.lainsce.rakugaki"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.desktop.in:8
+msgid "Raster;Drawing;"
 msgstr ""
