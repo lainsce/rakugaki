@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Rakugaki
+GenericName=Drawing Tool
 Comment=Draw, sketch or doodle
 Exec=com.github.lainsce.rakugaki
 Icon=com.github.lainsce.rakugaki
