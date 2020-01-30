@@ -1,0 +1,144 @@
+# Japanese translations for extra package.
+# Copyright (C) 2020 THE extra'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the extra package.
+# Ryo Nakano <ryonakaknock3@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: extra\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-30 19:28+0900\n"
+"PO-Revision-Date: 2020-01-30 07:51+0900\n"
+"Last-Translator: Ryo Nakano <ryonakaknock3@gmail.com>\n"
+"Language-Team: none\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.2.4\n"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:6
+#: data/com.github.lainsce.rakugaki.desktop.in:3
+msgid "Rakugaki"
+msgstr "Rakugaki"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:7
+msgid "Want to just draw, sketch or doodle? This is the tool for you."
+msgstr ""
+"絵やスケッチ、落書きをしたいですか？　そんなあなたにピッタリのツールです。"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:9
+msgid ""
+"Draw to your heart's content with this simple, no-friction, no excessive "
+"chrome, pad."
+msgstr ""
+"心にあるイメージを、シンプルで、イライラせず、過剰な機能のないこのアプリで描"
+"いてみましょう。"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:11
+msgid "Use half-toned strokes with Ctrl + 1"
+msgstr "ショートカットキー Ctrl + 1 で、網目状の線を描けます"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:12
+msgid "Quit anytime with the shortcut Ctrl + Q"
+msgstr "ショートカット Ctrl + Q で、いつでも終了できます"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:13
+msgid "Undo with the shortcut Ctrl + Z"
+msgstr "ショートカット Ctrl + Z で、元に戻せます"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:14
+msgid ""
+"Change line thickness by +5 or -5 with the respective shortcuts Ctrl + ) and "
+"Ctrl + ("
+msgstr ""
+"ショートカット Ctrl + ) と Ctrl + ( で、線の太さを 5 ずつ増減できます。"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:15
+msgid "Change the UI colors by using the special Ecosystem SVGs"
+msgstr "特別なアースカラー SVG を利用することで UI の色を変更できます"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:21
+msgid "Lains"
+msgstr "Lains"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:26
+msgid "Normal Colors"
+msgstr "通常の色"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:30
+msgid "With Ecosystem Colors"
+msgstr "アースカラー"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:66
+msgid "Release: Asa"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:68
+msgid "Fixed: Line smoothing."
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:69
+msgid "Fixed: Halftone."
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:75
+msgid "Release: Ongaku"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:77
+msgid "Added: Eraser function"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:78
+msgid "Fixed: Grid should be a guide, so it is top-most."
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:79
+msgid "And other small changes."
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:85
+msgid "Release: Yoru"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:87
+msgid "Fixed: Minor backend fixes"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:93
+msgid "Release: Hikaru"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:95
+msgid "Added: Half-tone drawing"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:96
+msgid "Fixed: Saving images with background"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:102
+msgid "Release: Yomikaki"
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:104
+msgid "First stable release."
+msgstr ""
+
+#: data/com.github.lainsce.rakugaki.desktop.in:4
+msgid ""
+"Want to just draw, sketch or doodle?\n"
+"This is the tool for you!"
+msgstr ""
+"絵やスケッチ、落書きをしたいですか？\n"
+"そんなあなたにピッタリのツールです！"
+
+#: data/com.github.lainsce.rakugaki.desktop.in:6
+msgid "com.github.lainsce.rakugaki"
+msgstr "com.github.lainsce.rakugaki"
+
+#: data/com.github.lainsce.rakugaki.desktop.in:7
+msgid "Raster;Drawing;"
+msgstr "Raster;Drawing;ラスター;お絵かき;ドロー;描画;"
