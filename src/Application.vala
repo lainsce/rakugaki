@@ -36,7 +36,7 @@ namespace Rakugaki {
 
         public static int main (string[] args) {
             Intl.setlocale (LocaleCategory.ALL, "");
-            Intl.textdomain (Build.GETTEXT_PACKAGE);
+            Intl.textdomain ("com.github.lainsce.rakugaki");
 
             var app = new Rakugaki.Application ();
             return app.run (args);
