@@ -1,0 +1,147 @@
+# French translations for extra package.
+# Copyright (C) 2020 THE extra'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the extra package.
+# Nathan Bonnemains (@NathanBnm), 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: extra\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-31 14:17+0100\n"
+"PO-Revision-Date: 2020-01-31 14:06+0100\n"
+"Last-Translator: Nathan Bonnemains (@NathanBnm)\n"
+"Language-Team: none\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:6
+#: data/com.github.lainsce.rakugaki.desktop.in:3
+msgid "Rakugaki"
+msgstr "Rakugaki"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:7
+msgid "Want to just draw, sketch or doodle? This is the tool for you."
+msgstr ""
+"Vous souhaitez juste dessiner, esquisser ou gribouiller ? Cet outil est fait "
+"pour vous."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:9
+msgid ""
+"Draw to your heart's content with this simple, no-friction, no excessive "
+"chrome, pad."
+msgstr ""
+"Dessinez à votre guise avec ce simple outil, sans fioriture, sans superflu."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:11
+msgid "Use half-toned strokes with Ctrl + 1"
+msgstr "Utilisez des traits en demi-ton avec Ctrl + 1"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:12
+msgid "Quit anytime with the shortcut Ctrl + Q"
+msgstr "Quittez à tout moment avec le raccourci Ctrl + Q"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:13
+msgid "Undo with the shortcut Ctrl + Z"
+msgstr "Annulez une action avec le raccourci Ctrl + Z"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:14
+msgid ""
+"Change line thickness by +5 or -5 with the respective shortcuts Ctrl + ) and "
+"Ctrl + ("
+msgstr ""
+"Modifiez l'épaisseur de ligne de +5 ou -5 avec les raccourcis respectifs "
+"Ctrl + ) et Ctrl + ("
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:15
+msgid "Change the UI colors by using the special Ecosystem SVGs"
+msgstr ""
+"Modification des couleurs de l'interface en utilisant les SVG Ecosystem "
+"spécifiques"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:21
+msgid "Lains"
+msgstr "Lains"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:26
+msgid "Normal Colors"
+msgstr "Couleurs normales"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:30
+msgid "With Ecosystem Colors"
+msgstr "Avec les couleurs d'Ecosystem"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:66
+msgid "Release: Asa"
+msgstr "Version : Asa"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:68
+msgid "Fixed: Line smoothing."
+msgstr "Corrigé : Lissage des lignes."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:69
+msgid "Fixed: Halftone."
+msgstr "Corrigé : Demi-ton."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:75
+msgid "Release: Ongaku"
+msgstr "Version : Ongaku"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:77
+msgid "Added: Eraser function"
+msgstr "Ajouté : Fonction gomme"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:78
+msgid "Fixed: Grid should be a guide, so it is top-most."
+msgstr ""
+"Corrigé : La grille doit être un guide, elle est donc la plus importante."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:79
+msgid "And other small changes."
+msgstr "Quelques autres petites modifications."
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:85
+msgid "Release: Yoru"
+msgstr "Version : Yoru"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:87
+msgid "Fixed: Minor backend fixes"
+msgstr "Corrigé : Corrections mineures en arrière-plan"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:93
+msgid "Release: Hikaru"
+msgstr "Version : Hikaru"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:95
+msgid "Added: Half-tone drawing"
+msgstr "Ajouté : Dessin en demi-ton"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:96
+msgid "Fixed: Saving images with background"
+msgstr "Corrigé : Enregistrement des images avec l'arrière-plan"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:102
+msgid "Release: Yomikaki"
+msgstr "Version : Yomikaki"
+
+#: data/com.github.lainsce.rakugaki.appdata.xml.in:104
+msgid "First stable release."
+msgstr "Première version stable."
+
+#: data/com.github.lainsce.rakugaki.desktop.in:4
+msgid ""
+"Want to just draw, sketch or doodle?\n"
+"This is the tool for you!"
+msgstr ""
+"Vous souhaitez juste dessiner, esquisser ou gribouiller ?\n"
+"Cet outil est fait pour vous !"
+
+#: data/com.github.lainsce.rakugaki.desktop.in:6
+msgid "com.github.lainsce.rakugaki"
+msgstr "com.github.lainsce.rakugaki"
+
+#: data/com.github.lainsce.rakugaki.desktop.in:7
+msgid "Raster;Drawing;"
+msgstr "Grille;Dessin;"
