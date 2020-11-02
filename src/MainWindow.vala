@@ -85,6 +85,19 @@ namespace Rakugaki {
                 @define-color textColorSecondary %s;
                 @define-color iconColorPrimary %s;
 
+                window.unified {
+                    border-radius: 8px;
+                }
+
+                .title {
+                    font-weight: 700;
+                }
+
+                .titlebutton image {
+                    color: @textColorPrimary;
+                    -gtk-icon-shadow: none;
+                }
+
                 .dm-window {
                     background: @colorPrimary;
                     color: @windowPrimary;
@@ -98,24 +111,25 @@ namespace Rakugaki {
                 }
 
                 .dm-sidebar,
-                .dm-sidebar .dm-actionbar,
+                .dm-sidebar .dm-box,
                 .dm-sidebar titlebar {
-                    background: mix (@colorAccent, @base_color, 0.85);
-                    box-shadow: 0 1px transparent inset;
-                    color: @textColorSecondary;
+                    background: mix (@colorSecondary, @colorPrimary, 0.85);
+                    box-shadow: none;
+                    border: none;
+                    color: @textColorPrimary;
                 }
 
-                .dm-actionbar image {
-                    color: alpha (@iconColorPrimary, 0.4);
+                .dm-box image {
+                    color: alpha (@textColorPrimary, 0.66);
                     -gtk-icon-shadow: none;
                 }
 
-                .dm-actionbar button:hover image {
-                    color: @iconColorPrimary;
+                .dm-box button:hover image {
+                    color: @textColorPrimary;
                 }
 
-                .dm-actionbar button:active image {
-                    color: @iconColorPrimary;
+                .dm-box button:active image {
+                    color: @textColorPrimary;
                 }
 
                 .dm-reverse image {
@@ -129,10 +143,11 @@ namespace Rakugaki {
                 .dm-text {
                     font-family: 'Cousine', Courier, monospace;
                     font-size: 1.66em;
+                    color: alpha (@textColorPrimary, 0.66);
                 }
 
                 .dm-clrbtn {
-                    background: mix (@colorAccent, @base_color, 0.85);
+                    background: mix (@colorSecondary, @colorPrimary, 0.85);
                     color: @textColorPrimary;
                     box-shadow: 0 1px transparent inset;
                     border: none;
@@ -175,6 +190,7 @@ namespace Rakugaki {
             titlebar = new Hdy.HeaderBar ();
             titlebar.show_close_button = true;
             titlebar.has_subtitle = false;
+            titlebar.title = "Rakugaki";
             var titlebar_style_context = titlebar.get_style_context ();
             titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
             titlebar_style_context.add_class ("dm-toolbar");
@@ -224,7 +240,6 @@ namespace Rakugaki {
             leaflet.add (separator);
             leaflet.add (grid);
             leaflet.set_visible_child (grid);
-            leaflet.child_set_property (separator, "allow-visible", false);
             leaflet.show_all ();
 
             update ();
@@ -312,36 +327,51 @@ namespace Rakugaki {
                         @define-color textColorSecondary %s;
                         @define-color iconColorPrimary %s;
 
+                        window.unified {
+                            border-radius: 8px;
+                        }
+
+                        .title {
+                            font-weight: 700;
+                        }
+
+                        .titlebutton image {
+                            color: @textColorPrimary;
+                            -gtk-icon-shadow: none;
+                        }
+
                         .dm-window {
                             background: @colorPrimary;
-                            color: @textColorPrimary;
+                            color: @windowPrimary;
                         }
 
                         .dm-toolbar {
                             background: @colorPrimary;
                             color: @windowPrimary;
-                            box-shadow: 0 1px transparent inset;
+                            box-shadow: none;
+                            border: none;
                         }
 
-                        .dm-actionbar {
-                            background: @colorPrimary;
-                            box-shadow: 0 1px transparent inset;
-                            color: @textColorSecondary;
-                            padding: 8px;
-                            border-top: 1px solid alpha (@textColorPrimary, 0);
+                        .dm-sidebar,
+                        .dm-sidebar .dm-box,
+                        .dm-sidebar titlebar {
+                            background: mix (@colorSecondary, @colorPrimary, 0.85);
+                            box-shadow: none;
+                            border: none;
+                            color: @textColorPrimary;
                         }
 
-                        .dm-actionbar image {
-                            color: alpha (@iconColorPrimary, 0.4);
+                        .dm-box image {
+                            color: alpha (@textColorPrimary, 0.66);
                             -gtk-icon-shadow: none;
                         }
 
-                        .dm-actionbar button:hover image {
-                            color: @iconColorPrimary;
+                        .dm-box button:hover image {
+                            color: @textColorPrimary;
                         }
 
-                        .dm-actionbar button:active image {
-                            color: @iconColorPrimary;
+                        .dm-box button:active image {
+                            color: @textColorPrimary;
                         }
 
                         .dm-reverse image {
@@ -355,10 +385,11 @@ namespace Rakugaki {
                         .dm-text {
                             font-family: 'Cousine', Courier, monospace;
                             font-size: 1.66em;
+                            color: alpha (@textColorPrimary, 0.66);
                         }
 
                         .dm-clrbtn {
-                            background: @colorPrimary;
+                            background: mix (@colorSecondary, @colorPrimary, 0.85);
                             color: @textColorPrimary;
                             box-shadow: 0 1px transparent inset;
                             border: none;

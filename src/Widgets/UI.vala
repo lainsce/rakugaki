@@ -275,7 +275,6 @@ namespace Rakugaki {
 
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");
-			this.margin = 1;
 			show_all ();
 
 			da.stroke_added.connect ((coordinates) => {
