@@ -63,6 +63,7 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
 
         title = new Gtk.Label (title_name);
         title.ellipsize = Pango.EllipsizeMode.END;
+        title.margin_start = 27;
         title.hexpand = false;
 
         var edit_button = new Gtk.Button ();
@@ -79,13 +80,14 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
         grid = new Gtk.Grid ();
         grid.valign = Gtk.Align.CENTER;
         grid.halign = Gtk.Align.START;
-        grid.column_spacing = 6;
         grid.hexpand = false;
         grid.add (title);
         grid.add (button_revealer);
 
         entry = new Gtk.Entry ();
         entry.hexpand = false;
+        entry.halign = Gtk.Align.CENTER;
+        entry.width_chars = 2;
         var entry_style_context = entry.get_style_context ();
         entry_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
 

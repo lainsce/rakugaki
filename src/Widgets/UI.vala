@@ -26,6 +26,7 @@ namespace Rakugaki {
 		public DrawingArea da;
 		public EditableLabel line_thickness_label;
 		public Gtk.ColorButton line_color_button;
+		public Gtk.Box box;
 
 		public List<Path> paths = new List<Path> ();
 		public Path current_path = null;
@@ -74,7 +75,7 @@ namespace Rakugaki {
 				dirty = true;
 				return false;
 			});
-	
+
 			da.button_release_event.connect ((e) => {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
@@ -85,16 +86,16 @@ namespace Rakugaki {
 					coordinates[i + 1] = point.y / (double)allocation.height;
 				}
 				stroke_added (coordinates);
-	
+
 				current_path = null;
 
 				return false;
 			});
-	
+
 			da.motion_notify_event.connect ((e) => {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
-	
+
 				double x = e.x.clamp ((double)allocation.x,
 										  (double)(allocation.x + allocation.width));
 				double y = e.y.clamp ((double)allocation.y,
@@ -120,31 +121,32 @@ namespace Rakugaki {
 
 				return false;
 			});
-	
+
 			da.draw.connect ((c) => {
 				main_draw (c);
 				return false;
 			});
 
-			var actionbar = new Gtk.ActionBar ();
-			actionbar.get_style_context ().add_class ("dm-actionbar");
-			
+			box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+			box.margin = 12;
+			box.get_style_context ().add_class ("dm-box");
+
 			var new_button = new Gtk.Button ();
 			new_button.has_tooltip = true;
 			new_button.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			new_button.tooltip_text = (_("New file"));
-			
+
 			new_button.clicked.connect ((e) => {
 				clear ();
 			});
-			
-			actionbar.pack_start (new_button);
-			
+
+			box.pack_start (new_button);
+
 			var save_button = new Gtk.Button ();
 			save_button.set_image (new Gtk.Image.from_icon_name ("document-save-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			save_button.has_tooltip = true;
 			save_button.tooltip_text = (_("Save file"));
-			
+
 			save_button.clicked.connect ((e) => {
 				try {
 					save ();
@@ -152,37 +154,37 @@ namespace Rakugaki {
 					warning ("Unexpected error during save: " + e.message);
 				}
 			});
-			
-			actionbar.pack_start (save_button);
-			
+
+			box.pack_start (save_button);
+
 			var undo_button = new Gtk.Button ();
 			undo_button.set_image (new Gtk.Image.from_icon_name ("edit-undo-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			undo_button.has_tooltip = true;
 			undo_button.tooltip_text = (_("Undo Last Line"));
-			
+
 			undo_button.clicked.connect ((e) => {
 				undo ();
 				current_path = new Path ();
 				da.queue_draw ();
 			});
-			
-			actionbar.pack_start (undo_button);
-			
+
+			box.pack_start (undo_button);
+
 			line_color_button = new Gtk.ColorButton ();
-			line_color_button.margin_start = 6;
 			line_color_button.height_request = 24;
 			line_color_button.width_request = 24;
+			line_color_button.halign = Gtk.Align.CENTER;
 			line_color_button.show_editor = true;
 			line_color_button.get_style_context ().add_class ("dm-clrbtn");
 			line_color_button.get_style_context ().remove_class ("color");
 			line_color_button.tooltip_text = (_("Line Color"));
-			actionbar.pack_start (line_color_button);
-			
+			box.pack_start (line_color_button);
+
 			line_color_button.color_set.connect ((e) => {
 				line_color = line_color_button.rgba;
 				da.queue_draw ();
 			});
-			
+
 			var line_thickness_button = new Gtk.Button ();
 			line_thickness_button.set_image (new Gtk.Image.from_icon_name ("line-thickness-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			line_thickness_button.has_tooltip = true;
@@ -192,7 +194,7 @@ namespace Rakugaki {
 			line_thickness_label.valign = Gtk.Align.CENTER;
 			line_thickness_label.hexpand = false;
 			line_thickness_label.margin_top = 3;
-			
+
 			line_thickness_button.clicked.connect ((e) => {
 				if (line_thickness < 50) {
 					line_thickness++;
@@ -204,7 +206,7 @@ namespace Rakugaki {
 					da.queue_draw ();
 				}
 			});
-			
+
 			line_thickness_label.changed.connect (() => {
 				if (int.parse(line_thickness_label.title.get_label ()) > 50 || int.parse(line_thickness_label.title.get_label ()) < 1) {
 					line_thickness = 1;
@@ -216,13 +218,13 @@ namespace Rakugaki {
 					da.queue_draw ();
 				}
 			});
-			
-			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
+
+			var line_thickness_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
 			line_thickness_box.pack_start (line_thickness_button);
 			line_thickness_box.pack_start (line_thickness_label);
-			
-			actionbar.pack_start (line_thickness_box);
-			
+
+			box.pack_start (line_thickness_box);
+
 			var halftone_button = new Gtk.Button ();
             halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			halftone_button.has_tooltip = true;
@@ -237,8 +239,8 @@ namespace Rakugaki {
 				}
             });
 
-			actionbar.pack_end (halftone_button);
-			
+			box.pack_end (halftone_button);
+
 			var eraser_button = new Gtk.Button ();
             eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			eraser_button.has_tooltip = true;
@@ -253,13 +255,13 @@ namespace Rakugaki {
 				}
             });
 
-            actionbar.pack_end (eraser_button);
-			
+            box.pack_end (eraser_button);
+
 			var see_grid_button = new Gtk.Button ();
 			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			see_grid_button.has_tooltip = true;
 			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
-			
+
 			see_grid_button.clicked.connect ((e) => {
 				if (see_grid == true) {
 					see_grid = false;
@@ -268,10 +270,9 @@ namespace Rakugaki {
 				}
 				da.queue_draw ();
 			});
-			
-			actionbar.pack_end (see_grid_button);
-			
-			this.pack_end (actionbar, false, false, 0);
+
+			box.pack_end (see_grid_button);
+
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");
 			this.margin = 1;
@@ -457,9 +458,9 @@ namespace Rakugaki {
 		public void save () throws Error {
 			debug ("Save as button pressed.");
 			var file = display_save_dialog ();
-			
+
 			string path = file.get_path ();
-			
+
 			if (file == null) {
 				debug ("User cancelled operation. Aborting.");
 			} else {
@@ -476,7 +477,7 @@ namespace Rakugaki {
 				Cairo.Context cr2 = new Cairo.Context (sf2);
 				Gdk.cairo_set_source_rgba (cr2, line_color);
 				draws (cr2);
-	
+
 				c.set_source_surface (cr2.get_target (), 0, 0);
 				c.rectangle (0, 0, allocation.width, allocation.height);
 				c.paint ();
@@ -484,7 +485,7 @@ namespace Rakugaki {
 				file = null;
 			}
 		}
-		
+
 		public Gtk.FileChooserDialog create_file_chooser (string title,
 		Gtk.FileChooserAction action) {
 			var chooser = new Gtk.FileChooserDialog (title, null, action);
@@ -499,14 +500,14 @@ namespace Rakugaki {
 			filter1.set_filter_name (_("PNG files"));
 			filter1.add_pattern ("*.png");
 			chooser.add_filter (filter1);
-			
+
 			var filter = new Gtk.FileFilter ();
 			filter.set_filter_name (_("All files"));
 			filter.add_pattern ("*");
 			chooser.add_filter (filter);
 			return chooser;
 		}
-		
+
 		public File display_save_dialog () {
 			var chooser = create_file_chooser (_("Save file"),
 			Gtk.FileChooserAction.SAVE);
@@ -516,7 +517,7 @@ namespace Rakugaki {
 			chooser.destroy();
 			return file;
 		}
-		
+
 		#if VALA_0_42
 		protected bool match_keycode (uint keyval, uint code) {
 			#else
@@ -530,7 +531,7 @@ namespace Rakugaki {
 						return true;
 					}
 				}
-				
+
 				return false;
 			}
 	}

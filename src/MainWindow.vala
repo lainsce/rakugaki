@@ -17,16 +17,23 @@
 * Boston, MA 02110-1301 USA
 */
 namespace Rakugaki {
-    public class MainWindow : Gtk.Window {
+    public class MainWindow : Hdy.Window {
         public Widgets.UI ui;
-        public Gtk.HeaderBar titlebar;
+        public Hdy.HeaderBar titlebar;
+        public Hdy.HeaderBar faux_titlebar;
         public Gtk.ActionBar actionbar;
         public Granite.ModeSwitch mode_switch;
+        public Gtk.Grid grid;
+        public Gtk.Grid sgrid;
+        public Gtk.Box main_frame_grid;
+        public Gtk.Separator separator;
+        public Hdy.Leaflet leaflet;
+
         private int uid;
         private static int uid_counter = 0;
 
         // Global Color Palette
-        public string background = "#FCF6E1";
+        public string background = "#F6F6F6";
         public string f_high = "#30292E";
         public string f_med = "#90898e";
         public string f_low = "#C0B9BEC";
@@ -42,6 +49,7 @@ namespace Rakugaki {
         }};
 
         public MainWindow (Gtk.Application application) {
+            Hdy.init ();
             GLib.Object (
                 application: application,
                 icon_name: "com.github.lainsce.rakugaki",
@@ -79,21 +87,22 @@ namespace Rakugaki {
 
                 .dm-window {
                     background: @colorPrimary;
-                    color: @textColorPrimary;
+                    color: @windowPrimary;
                 }
 
                 .dm-toolbar {
                     background: @colorPrimary;
                     color: @windowPrimary;
-                    box-shadow: 0 1px transparent inset;
+                    box-shadow: none;
+                    border: none;
                 }
 
-                .dm-actionbar {
-                    background: @colorPrimary;
+                .dm-sidebar,
+                .dm-sidebar .dm-actionbar,
+                .dm-sidebar titlebar {
+                    background: mix (@colorAccent, @base_color, 0.85);
                     box-shadow: 0 1px transparent inset;
                     color: @textColorSecondary;
-                    padding: 8px;
-                    border-top: 1px solid alpha (@textColorPrimary, 0);
                 }
 
                 .dm-actionbar image {
@@ -123,7 +132,7 @@ namespace Rakugaki {
                 }
 
                 .dm-clrbtn {
-                    background: @colorPrimary;
+                    background: mix (@colorAccent, @base_color, 0.85);
                     color: @textColorPrimary;
                     box-shadow: 0 1px transparent inset;
                     border: none;
@@ -163,13 +172,19 @@ namespace Rakugaki {
             weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
             default_theme.add_resource_path ("/com/github/lainsce/rakugaki");
 
-            titlebar = new Gtk.HeaderBar ();
+            titlebar = new Hdy.HeaderBar ();
             titlebar.show_close_button = true;
             titlebar.has_subtitle = false;
             var titlebar_style_context = titlebar.get_style_context ();
             titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
             titlebar_style_context.add_class ("dm-toolbar");
-            this.set_titlebar (titlebar);
+
+            faux_titlebar = new Hdy.HeaderBar ();
+            faux_titlebar.show_close_button = true;
+            faux_titlebar.has_subtitle = false;
+            var faux_titlebar_style_context = faux_titlebar.get_style_context ();
+            faux_titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
+            faux_titlebar_style_context.add_class ("dm-sidebar");
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
@@ -181,22 +196,61 @@ namespace Rakugaki {
             scrolled.add (ui);
             scrolled.expand = true;
 
-            actionbar = new Gtk.ActionBar ();
-			actionbar.get_style_context ().add_class ("dm-actionbar");
+            sgrid = new Gtk.Grid ();
+            sgrid.get_style_context ().add_class ("dm-sidebar");
+            sgrid.attach (faux_titlebar, 0, 0, 1, 1);
+            sgrid.attach (ui.box, 0, 1, 1, 1);
+            sgrid.set_size_request (90,-1);
+            sgrid.show_all ();
 
-            var grid = new Gtk.Grid ();
-            grid.orientation = Gtk.Orientation.VERTICAL;
-            grid.expand = true;
-            grid.attach (scrolled, 1, 0, 1, 1);
+            main_frame_grid = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            main_frame_grid.expand = true;
+            main_frame_grid.add (scrolled);
+
+            grid = new Gtk.Grid ();
+            grid.attach (titlebar, 1, 0, 1, 1);
+            grid.attach (main_frame_grid, 1, 1, 1, 1);
             grid.show_all ();
+
+            separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+            var separator_cx = separator.get_style_context ();
+            separator_cx.add_class ("vsep");
+
+            leaflet = new Hdy.Leaflet () {
+                transition_type = Hdy.LeafletTransitionType.UNDER,
+                can_swipe_back = true
+            };
+            leaflet.add (sgrid);
+            leaflet.add (separator);
+            leaflet.add (grid);
+            leaflet.set_visible_child (grid);
+            leaflet.child_set_property (separator, "allow-visible", false);
+            leaflet.show_all ();
+
+            update ();
+            leaflet.notify["folded"].connect (() => {
+                update ();
+            });
 
             Gtk.drag_dest_set (this,Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY);
             this.drag_data_received.connect(this.on_drag_data_received);
-            this.add (grid);
+            this.add (leaflet);
             this.show_all ();
         }
 
-        private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
+        private void update () {
+            if (leaflet != null && leaflet.get_folded ()) {
+                // On Mobile size, so.... have to have no buttons anywhere.
+                faux_titlebar.set_decoration_layout (":");
+                titlebar.set_decoration_layout (":");
+            } else {
+                // Else you're on Desktop size, so business as usual.
+                faux_titlebar.set_decoration_layout ("close:");
+                titlebar.set_decoration_layout (":maximize");
+            }
+        }
+
+        private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y,
                                         Gtk.SelectionData data, uint info, uint time) {
             foreach(string uri in data.get_uris ()) {
                 string file = uri.replace ("file://","").replace ("file:/","");
