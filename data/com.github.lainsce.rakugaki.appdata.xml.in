@@ -61,6 +61,14 @@
         <content_attribute id="money-gambling">none</content_attribute>
     </content_rating>
     <releases>
+        <release version="2.0.0" date="2020-??-??">
+            <description>
+                <p>Release: Aki</p>
+                <ul>
+                    <li>New: Hello Odin!</li>
+                </ul>
+            </description>
+        </release>
         <release version="1.0.5" date="2020-02-02">
             <description>
                 <p>Release: Asa</p>
@@ -107,8 +115,8 @@
         </release>
     </releases>
     <custom>
-        <value key="x-appcenter-color-primary">#1EFE89</value>
+        <value key="x-appcenter-color-primary">#90898e</value>
         <value key="x-appcenter-color-primary-text">#000</value>
-        <value key="x-appcenter-suggested-price">5</value>
+        <value key="x-appcenter-suggested-price">6</value>
     </custom>
 </component>
