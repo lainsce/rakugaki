@@ -33,7 +33,7 @@ namespace Rakugaki {
         private static int uid_counter = 0;
 
         // Global Color Palette
-        public string background = "#F6F6F6";
+        public string background = "#F7F7F7";
         public string f_high = "#30292E";
         public string f_med = "#90898e";
         public string f_low = "#C0B9BEC";
@@ -53,8 +53,8 @@ namespace Rakugaki {
             GLib.Object (
                 application: application,
                 icon_name: "com.github.lainsce.rakugaki",
-                height_request: 780,
-                width_request: 1010,
+                height_request: 585,
+                width_request: 755,
                 title: (_("Rakugaki"))
             );
 
@@ -80,6 +80,7 @@ namespace Rakugaki {
                 @define-color colorPrimary %s;
                 @define-color colorSecondary %s;
                 @define-color colorAccent %s;
+                @define-color windowBackground %s;
                 @define-color windowPrimary %s;
                 @define-color textColorPrimary %s;
                 @define-color textColorSecondary %s;
@@ -91,10 +92,11 @@ namespace Rakugaki {
 
                 .title {
                     font-weight: 700;
+                    text-shadow: none;
                 }
 
                 .titlebutton image {
-                    color: @textColorPrimary;
+                    color: #000;
                     -gtk-icon-shadow: none;
                 }
 
@@ -104,10 +106,16 @@ namespace Rakugaki {
                 }
 
                 .dm-toolbar {
-                    background: @colorPrimary;
-                    color: @windowPrimary;
+                    background: #FFF;
+                    color: #000;
                     box-shadow: none;
                     border: none;
+                    border-bottom: 1px solid alpha(black, 0.25);
+                }
+
+                .dm-toolbar .image-button {
+                    color: #000;
+                    -gtk-icon-shadow: none;
                 }
 
                 .dm-sidebar,
@@ -116,7 +124,17 @@ namespace Rakugaki {
                     background: mix (@colorSecondary, @colorPrimary, 0.85);
                     box-shadow: none;
                     border: none;
-                    color: @textColorPrimary;
+                    color: @iconColorPrimary;
+                }
+
+                .dm-tool {
+                    border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                    margin-bottom: 6px;
+                    border-radius: 8px;
+                }
+
+                .dm-tool:hover {
+                    border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
                 }
 
                 .dm-box image {
@@ -124,12 +142,12 @@ namespace Rakugaki {
                     -gtk-icon-shadow: none;
                 }
 
-                .dm-box button:hover image {
-                    color: @textColorPrimary;
+                .dm-box button:not(.dm-tool):hover image {
+                    color: @iconColorPrimary;
                 }
 
-                .dm-box button:active image {
-                    color: @textColorPrimary;
+                .dm-box button:not(.dm-tool):active image {
+                    color: @iconColorPrimary;
                 }
 
                 .dm-reverse image {
@@ -143,7 +161,7 @@ namespace Rakugaki {
                 .dm-text {
                     font-family: 'Cousine', Courier, monospace;
                     font-size: 1.66em;
-                    color: alpha (@textColorPrimary, 0.66);
+                    color: @textColorPrimary;
                 }
 
                 .dm-clrbtn {
@@ -160,7 +178,7 @@ namespace Rakugaki {
                 .dm-clrbtn colorswatch {
                     border-radius: 8px;
                 }
-            """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.b_high, this.f_high);
+                """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv);
             try {
                 var provider = new Gtk.CssProvider ();
                 provider.load_from_data (css_light, -1);
@@ -195,6 +213,34 @@ namespace Rakugaki {
             titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
             titlebar_style_context.add_class ("dm-toolbar");
 
+            var new_button = new Gtk.Button ();
+			new_button.has_tooltip = true;
+			new_button.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+			new_button.tooltip_text = (_("New file"));
+
+			titlebar.pack_start (new_button);
+
+			var save_button = new Gtk.Button ();
+			save_button.set_image (new Gtk.Image.from_icon_name ("document-save-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+			save_button.has_tooltip = true;
+			save_button.tooltip_text = (_("Save file"));
+
+			titlebar.pack_start (save_button);
+
+			var undo_button = new Gtk.Button ();
+			undo_button.set_image (new Gtk.Image.from_icon_name ("edit-undo-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+			undo_button.has_tooltip = true;
+			undo_button.tooltip_text = (_("Undo Last Line"));
+
+            titlebar.pack_start (undo_button);
+
+            var see_grid_button = new Gtk.Button ();
+			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			see_grid_button.has_tooltip = true;
+			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
+            
+            titlebar.pack_end (see_grid_button);
+
             faux_titlebar = new Hdy.HeaderBar ();
             faux_titlebar.show_close_button = true;
             faux_titlebar.has_subtitle = false;
@@ -211,6 +257,33 @@ namespace Rakugaki {
 			ui.line_color_button.rgba = ui.line_color;
             scrolled.add (ui);
             scrolled.expand = true;
+
+            new_button.clicked.connect ((e) => {
+				ui.clear ();
+            });
+            
+            save_button.clicked.connect ((e) => {
+				try {
+					ui.save ();
+				} catch (Error e) {
+					warning ("Unexpected error during save: " + e.message);
+				}
+            });
+            
+            undo_button.clicked.connect ((e) => {
+				ui.undo ();
+				ui.current_path = new Path ();
+				ui.da.queue_draw ();
+            });
+
+            see_grid_button.clicked.connect ((e) => {
+				if (ui.see_grid == true) {
+					ui.see_grid = false;
+				} else if (ui.see_grid == false) {
+					ui.see_grid = true;
+				}
+				ui.da.queue_draw ();
+            });
 
             sgrid = new Gtk.Grid ();
             sgrid.get_style_context ().add_class ("dm-sidebar");
@@ -319,90 +392,109 @@ namespace Rakugaki {
                         }
                     } while (match.next ());
                     string css_light = """
-                        @define-color colorPrimary %s;
-                        @define-color colorSecondary %s;
-                        @define-color colorAccent %s;
-                        @define-color windowPrimary %s;
-                        @define-color textColorPrimary %s;
-                        @define-color textColorSecondary %s;
-                        @define-color iconColorPrimary %s;
-
-                        window.unified {
-                            border-radius: 8px;
-                        }
-
-                        .title {
-                            font-weight: 700;
-                        }
-
-                        .titlebutton image {
-                            color: @textColorPrimary;
-                            -gtk-icon-shadow: none;
-                        }
-
-                        .dm-window {
-                            background: @colorPrimary;
-                            color: @windowPrimary;
-                        }
-
-                        .dm-toolbar {
-                            background: @colorPrimary;
-                            color: @windowPrimary;
-                            box-shadow: none;
-                            border: none;
-                        }
-
-                        .dm-sidebar,
-                        .dm-sidebar .dm-box,
-                        .dm-sidebar titlebar {
-                            background: mix (@colorSecondary, @colorPrimary, 0.85);
-                            box-shadow: none;
-                            border: none;
-                            color: @textColorPrimary;
-                        }
-
-                        .dm-box image {
-                            color: alpha (@textColorPrimary, 0.66);
-                            -gtk-icon-shadow: none;
-                        }
-
-                        .dm-box button:hover image {
-                            color: @textColorPrimary;
-                        }
-
-                        .dm-box button:active image {
-                            color: @textColorPrimary;
-                        }
-
-                        .dm-reverse image {
-                            -gtk-icon-transform: rotate(180deg);
-                        }
-
-                        .dm-grid {
-                            background: @colorPrimary;
-                        }
-
-                        .dm-text {
-                            font-family: 'Cousine', Courier, monospace;
-                            font-size: 1.66em;
-                            color: alpha (@textColorPrimary, 0.66);
-                        }
-
-                        .dm-clrbtn {
-                            background: mix (@colorSecondary, @colorPrimary, 0.85);
-                            color: @textColorPrimary;
-                            box-shadow: 0 1px transparent inset;
-                            border: none;
-                        }
-
-                        .dm-clrbtn:active {
-                            background: @colorAccent;
-                        }
-
-                        .dm-clrbtn colorswatch {
-                            border-radius: 8px;
-                        }
-                    """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.b_high, this.f_high);
+                    @define-color colorPrimary %s;
+                    @define-color colorSecondary %s;
+                    @define-color colorAccent %s;
+                    @define-color windowBackground %s;
+                    @define-color windowPrimary %s;
+                    @define-color textColorPrimary %s;
+                    @define-color textColorSecondary %s;
+                    @define-color iconColorPrimary %s;
+    
+                    window.unified {
+                        border-radius: 8px;
+                    }
+    
+                    .title {
+                        font-weight: 700;
+                        text-shadow: none;
+                    }
+    
+                    .titlebutton image {
+                        color: @textColorPrimary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-window {
+                        background: @colorPrimary;
+                        color: @windowPrimary;
+                    }
+    
+                    .dm-toolbar {
+                        background: @windowBackground;
+                        color: @textColorPrimary;
+                        -gtk-icon-shadow: none;
+                        box-shadow: none;
+                        border: none;
+                        border-bottom: 1px solid alpha(black, 0.25);
+                    }
+    
+                    .dm-toolbar .image-button {
+                        color: @textColorPrimary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-sidebar,
+                    .dm-sidebar .dm-box,
+                    .dm-sidebar titlebar {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        box-shadow: none;
+                        border: none;
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-tool {
+                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                        margin-bottom: 6px;
+                        border-radius: 8px;
+                    }
+    
+                    .dm-tool:hover {
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
+                    }
+    
+                    .dm-box image {
+                        color: alpha (@textColorPrimary, 0.66);
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-box button:not(.dm-tool):hover image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-box button:not(.dm-tool):active image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-reverse image {
+                        -gtk-icon-transform: rotate(180deg);
+                    }
+    
+                    .dm-grid {
+                        background: @colorPrimary;
+                    }
+    
+                    .dm-text {
+                        font-family: 'Cousine', Courier, monospace;
+                        font-size: 1.66em;
+                        color: @textColorPrimary;
+                    }
+    
+                    .dm-clrbtn {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        color: @textColorPrimary;
+                        box-shadow: 0 1px transparent inset;
+                        border: none;
+                    }
+    
+                    .dm-clrbtn:active {
+                        background: @colorAccent;
+                    }
+    
+                    .dm-clrbtn colorswatch {
+                        border-radius: 8px;
+                    }
+                    """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.f_high, this.b_high, this.f_inv);
 
                     try {
                         var provider = new Gtk.CssProvider ();

@@ -26,7 +26,7 @@ namespace Rakugaki {
 		public DrawingArea da;
 		public EditableLabel line_thickness_label;
 		public Gtk.ColorButton line_color_button;
-		public Gtk.Box box;
+		public Gtk.Grid box;
 
 		public List<Path> paths = new List<Path> ();
 		public Path current_path = null;
@@ -127,58 +127,19 @@ namespace Rakugaki {
 				return false;
 			});
 
-			box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+			box = new Gtk.Grid ();
+			box.orientation = Gtk.Orientation.VERTICAL;
 			box.margin = 12;
+			box.vexpand = true;
 			box.get_style_context ().add_class ("dm-box");
-
-			var new_button = new Gtk.Button ();
-			new_button.has_tooltip = true;
-			new_button.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			new_button.tooltip_text = (_("New file"));
-
-			new_button.clicked.connect ((e) => {
-				clear ();
-			});
-
-			box.pack_start (new_button);
-
-			var save_button = new Gtk.Button ();
-			save_button.set_image (new Gtk.Image.from_icon_name ("document-save-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			save_button.has_tooltip = true;
-			save_button.tooltip_text = (_("Save file"));
-
-			save_button.clicked.connect ((e) => {
-				try {
-					save ();
-				} catch (Error e) {
-					warning ("Unexpected error during save: " + e.message);
-				}
-			});
-
-			box.pack_start (save_button);
-
-			var undo_button = new Gtk.Button ();
-			undo_button.set_image (new Gtk.Image.from_icon_name ("edit-undo-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			undo_button.has_tooltip = true;
-			undo_button.tooltip_text = (_("Undo Last Line"));
-
-			undo_button.clicked.connect ((e) => {
-				undo ();
-				current_path = new Path ();
-				da.queue_draw ();
-			});
-
-			box.pack_start (undo_button);
 
 			line_color_button = new Gtk.ColorButton ();
 			line_color_button.height_request = 24;
 			line_color_button.width_request = 24;
-			line_color_button.halign = Gtk.Align.CENTER;
 			line_color_button.show_editor = true;
 			line_color_button.get_style_context ().add_class ("dm-clrbtn");
 			line_color_button.get_style_context ().remove_class ("color");
 			line_color_button.tooltip_text = (_("Line Color"));
-			box.pack_start (line_color_button);
 
 			line_color_button.color_set.connect ((e) => {
 				line_color = line_color_button.rgba;
@@ -219,16 +180,17 @@ namespace Rakugaki {
 				}
 			});
 
-			var line_thickness_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
+			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
 			line_thickness_box.pack_start (line_thickness_button);
 			line_thickness_box.pack_start (line_thickness_label);
-
-			box.pack_start (line_thickness_box);
 
 			var halftone_button = new Gtk.Button ();
             halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			halftone_button.has_tooltip = true;
-			halftone_button.tooltip_text = (_("Change Pen Type"));
+			halftone_button.always_show_image = true;
+			halftone_button.tooltip_text = (_("Halftoner"));
+			halftone_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			halftone_button.get_style_context ().add_class ("dm-tool");
 
 			halftone_button.clicked.connect ((e) => {
 				eraser = false;
@@ -239,12 +201,13 @@ namespace Rakugaki {
 				}
             });
 
-			box.pack_end (halftone_button);
-
 			var eraser_button = new Gtk.Button ();
             eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			eraser_button.has_tooltip = true;
+			eraser_button.always_show_image = true;
 			eraser_button.tooltip_text = (_("Eraser"));
+			eraser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			eraser_button.get_style_context ().add_class ("dm-tool");
 
 			eraser_button.clicked.connect ((e) => {
 				halftone = false;
@@ -255,23 +218,14 @@ namespace Rakugaki {
 				}
             });
 
-            box.pack_end (eraser_button);
+			var separator = new Gtk.Grid ();
+			separator.vexpand = true;
 
-			var see_grid_button = new Gtk.Button ();
-			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			see_grid_button.has_tooltip = true;
-			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
-
-			see_grid_button.clicked.connect ((e) => {
-				if (see_grid == true) {
-					see_grid = false;
-				} else if (see_grid == false) {
-					see_grid = true;
-				}
-				da.queue_draw ();
-			});
-
-			box.pack_end (see_grid_button);
+			box.attach (eraser_button, 0, 1, 1, 1);
+			box.attach (halftone_button, 0, 2, 1, 1);
+			box.attach (separator, 0, 3, 1, 1);
+			box.attach (line_color_button, 0, 4, 1, 1);
+			box.attach (line_thickness_box, 0, 5, 1, 1);
 
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");
@@ -396,7 +350,7 @@ namespace Rakugaki {
 		}
 
 		// IO Section
-		private void clear () {
+		public void clear () {
 			var dialog = new Dialog ();
 			dialog.transient_for = win;
 
