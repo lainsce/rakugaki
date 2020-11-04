@@ -266,36 +266,20 @@ namespace Rakugaki {
 			foreach (var path in paths) {
 				if (path.is_halftone) {
 					Gdk.cairo_set_source_rgba (cr, line_color);
-					cr.set_line_width (9);
+					cr.set_line_width (1);
 					foreach (var point in path.points.next) {
-						cr.rectangle (point.x, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 9, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 2, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 5, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 8, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 9, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 2, point.y + 9, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 5, point.y + 9, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 8, point.y + 9, 1, 1);
-						cr.fill ();
+						int i, j;
+						int h = this.get_allocated_height ();
+						int w = this.get_allocated_width ();
+
+						for (i = 1; i <= w / (ratio*2); i++) {
+							for (j = 1; j <= h / (ratio+2); j++) {
+								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+									cr.rectangle (point.x + i, point.y + j, 1, 1);
+									cr.fill ();
+								}
+							}
+						}
 					}
 					cr.stroke ();
 				}
