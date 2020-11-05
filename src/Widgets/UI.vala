@@ -265,16 +265,20 @@ namespace Rakugaki {
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
-					Gdk.cairo_set_source_rgba (cr, line_color);
+					cr.set_operator(Cairo.Operator.SOURCE);
 					cr.set_line_width (1);
 					foreach (var point in path.points.next) {
 						int i, j;
 						int h = this.get_allocated_height ();
 						int w = this.get_allocated_width ();
-
 						for (i = 1; i <= w / (ratio*2); i++) {
 							for (j = 1; j <= h / (ratio+2); j++) {
 								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+									cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+									cr.rectangle (Math.fabs(point.x + i), Math.fabs(point.y + j), 1, 1);
+									cr.fill ();
+								} else {
+									cr.set_source_rgba (0, 0, 0, 0);
 									cr.rectangle (point.x + i, point.y + j, 1, 1);
 									cr.fill ();
 								}
