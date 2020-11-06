@@ -3,8 +3,8 @@ namespace Rakugaki {
 		public double x;
 		public double y;
 		public Point (double x, double y) {
-			this.x = x;
-			this.y = y;
+			this.x = Math.fabs(x);
+			this.y = Math.fabs(y);
 		}
 	}
 
@@ -184,8 +184,21 @@ namespace Rakugaki {
 			line_thickness_box.pack_start (line_thickness_button);
 			line_thickness_box.pack_start (line_thickness_label);
 
+			var normal_button = new Gtk.Button ();
+            normal_button.set_image (new Gtk.Image.from_icon_name ("line-cap-normal-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			normal_button.has_tooltip = true;
+			normal_button.always_show_image = true;
+			normal_button.tooltip_text = (_("Pen"));
+			normal_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			normal_button.get_style_context ().add_class ("dm-tool");
+
+			normal_button.clicked.connect ((e) => {
+				eraser = false;
+				halftone = false;
+            });
+
 			var halftone_button = new Gtk.Button ();
-            halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-halftone-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			halftone_button.has_tooltip = true;
 			halftone_button.always_show_image = true;
 			halftone_button.tooltip_text = (_("Halftoner"));
@@ -193,12 +206,8 @@ namespace Rakugaki {
 			halftone_button.get_style_context ().add_class ("dm-tool");
 
 			halftone_button.clicked.connect ((e) => {
+				halftone = true;
 				eraser = false;
-				if (halftone) {
-					halftone = false;
-				} else {
-					halftone = true;
-				}
             });
 
 			var eraser_button = new Gtk.Button ();
@@ -211,18 +220,15 @@ namespace Rakugaki {
 
 			eraser_button.clicked.connect ((e) => {
 				halftone = false;
-				if (eraser) {
-					eraser = false;
-				} else {
-					eraser = true;
-				}
+				eraser = true;
             });
 
 			var separator = new Gtk.Grid ();
 			separator.vexpand = true;
 
-			box.attach (eraser_button, 0, 1, 1, 1);
-			box.attach (halftone_button, 0, 2, 1, 1);
+			box.attach (normal_button, 0, 0, 1, 1);
+			box.attach (halftone_button, 0, 1, 1, 1);
+			box.attach (eraser_button, 0, 2, 1, 1);
 			box.attach (separator, 0, 3, 1, 1);
 			box.attach (line_color_button, 0, 4, 1, 1);
 			box.attach (line_thickness_box, 0, 5, 1, 1);
@@ -265,20 +271,20 @@ namespace Rakugaki {
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
-					cr.set_operator(Cairo.Operator.SOURCE);
+					cr.set_operator(Cairo.Operator.DIFFERENCE);
 					cr.set_line_width (1);
 					foreach (var point in path.points.next) {
 						int i, j;
 						int h = this.get_allocated_height ();
 						int w = this.get_allocated_width ();
 						for (i = 1; i <= w / (ratio*2); i++) {
-							for (j = 1; j <= h / (ratio+2); j++) {
+							for (j = 1; j <= h / (ratio+4); j++) {
 								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
 									cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-									cr.rectangle (Math.fabs(point.x + i), Math.fabs(point.y + j), 1, 1);
+									cr.rectangle (point.x + i, point.y + j, 1, 1);
 									cr.fill ();
 								} else {
-									cr.set_source_rgba (0, 0, 0, 0);
+									cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
 									cr.rectangle (point.x + i, point.y + j, 1, 1);
 									cr.fill ();
 								}

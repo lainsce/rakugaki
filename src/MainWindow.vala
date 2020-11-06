@@ -63,81 +63,11 @@ namespace Rakugaki {
             );
 
             if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
-                t_background = "#000";
-                t_foreground = "#FFF";
-                background = "#181818";
-                f_high = "#F0E9EE";
-                f_med = "#90898E";
-                f_low = "#30393C";
-                f_inv = "#F0E9EE";
-                b_high = "#F0E9EE";
-                b_med = "#80797E";
-                b_low = "#333333";
-                b_inv = "#FFB545";
-                ui.line_color.parse (this.f_high);
-                ui.grid_main_dot_color.parse (this.b_med);
-                ui.grid_dot_color.parse (this.b_low);
-                ui.background_color.parse (this.background);
-                ui.line_color_button.rgba = ui.line_color;
-            } else if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.NO_PREFERENCE) {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-                t_background = "#FFF";
-                t_foreground = "#000";
-                background = "#F7F7F7";
-                f_high = "#30292E";
-                f_med = "#90898E";
-                f_low = "#C0B9BEC";
-                f_inv = "#30292E";
-                b_high = "#30292E";
-                b_med = "#80797E";
-                b_low = "#AAAAAA";
-                b_inv = "#FFB545";
-                ui.line_color.parse (this.f_high);
-                ui.grid_main_dot_color.parse (this.b_med);
-                ui.grid_dot_color.parse (this.b_low);
-                ui.background_color.parse (this.background);
-                ui.line_color_button.rgba = ui.line_color;
+                change_theme ();
             }
 
             Rakugaki.Application.grsettings.notify["prefers-color-scheme"].connect (() => {
-                if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
-                    Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
-                    t_background = "#000";
-                    t_foreground = "#FFF";
-                    background = "#181818";
-                    f_high = "#F0E9EE";
-                    f_med = "#90898E";
-                    f_low = "#30393C";
-                    f_inv = "#F0E9EE";
-                    b_high = "#F0E9EE";
-                    b_med = "#80797E";
-                    b_low = "#333333";
-                    b_inv = "#FFB545";
-                    ui.line_color.parse (this.f_high);
-                    ui.grid_main_dot_color.parse (this.b_med);
-                    ui.grid_dot_color.parse (this.b_low);
-                    ui.background_color.parse (this.background);
-                    ui.line_color_button.rgba = ui.line_color;
-                } else if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.NO_PREFERENCE) {
-                    Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-                    t_background = "#FFF";
-                    t_foreground = "#000";
-                    background = "#F7F7F7";
-                    f_high = "#30292E";
-                    f_med = "#90898E";
-                    f_low = "#C0B9BEC";
-                    f_inv = "#30292E";
-                    b_high = "#30292E";
-                    b_med = "#80797E";
-                    b_low = "#AAAAAA";
-                    b_inv = "#FFB545";
-                    ui.line_color.parse (this.f_high);
-                    ui.grid_main_dot_color.parse (this.b_med);
-                    ui.grid_dot_color.parse (this.b_low);
-                    ui.background_color.parse (this.background);
-                    ui.line_color_button.rgba = ui.line_color;
-                }
+                change_theme ();
             });
 
             key_press_event.connect ((e) => {
@@ -158,116 +88,6 @@ namespace Rakugaki {
             });
 
             this.uid = uid_counter++;
-            string css_light = """
-                @define-color colorPrimary %s;
-                @define-color colorSecondary %s;
-                @define-color colorAccent %s;
-                @define-color windowBackground %s;
-                @define-color windowPrimary %s;
-                @define-color textColorPrimary %s;
-                @define-color textColorSecondary %s;
-                @define-color iconColorPrimary %s;
-                @define-color titlePrimary %s;
-                @define-color titleSecondary %s;
-
-                window.unified {
-                    border-radius: 8px;
-                }
-
-                .title {
-                    font-weight: 700;
-                    text-shadow: none;
-                }
-
-                .titlebutton image {
-                    color: @titleSecondary;
-                    -gtk-icon-shadow: none;
-                }
-
-                .dm-window {
-                    background: @colorPrimary;
-                    color: @windowPrimary;
-                }
-
-                .dm-toolbar {
-                    background: @titlePrimary;
-                    color: @titleSecondary;
-                    box-shadow: none;
-                    border: none;
-                    border-bottom: 1px solid alpha(black, 0.25);
-                }
-
-                .dm-toolbar .image-button {
-                    color: @titleSecondary;
-                    -gtk-icon-shadow: none;
-                }
-
-                .dm-sidebar,
-                .dm-sidebar .dm-box,
-                .dm-sidebar titlebar {
-                    background: mix (@colorSecondary, @colorPrimary, 0.85);
-                    box-shadow: none;
-                    border: none;
-                    color: @iconColorPrimary;
-                }
-
-                .dm-tool {
-                    border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
-                    margin-bottom: 6px;
-                    border-radius: 8px;
-                }
-
-                .dm-tool:hover {
-                    border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
-                }
-
-                .dm-box image {
-                    color: alpha (@textColorPrimary, 0.66);
-                    -gtk-icon-shadow: none;
-                }
-
-                .dm-box button:not(.dm-tool):hover image {
-                    color: @iconColorPrimary;
-                }
-
-                .dm-box button:not(.dm-tool):active image {
-                    color: @iconColorPrimary;
-                }
-
-                .dm-reverse image {
-                    -gtk-icon-transform: rotate(180deg);
-                }
-
-                .dm-grid {
-                    background: @colorPrimary;
-                }
-
-                .dm-text {
-                    font-family: 'Cousine', Courier, monospace;
-                    font-size: 1.66em;
-                    color: @textColorPrimary;
-                }
-
-                .dm-clrbtn {
-                    background: mix (@colorSecondary, @colorPrimary, 0.85);
-                    color: @textColorPrimary;
-                    box-shadow: 0 1px transparent inset;
-                    border: none;
-                }
-
-                .dm-clrbtn:active {
-                    background: @colorAccent;
-                }
-
-                .dm-clrbtn colorswatch {
-                    border-radius: 8px;
-                }
-                """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv, this.t_background, this.t_foreground);
-            try {
-                var provider = new Gtk.CssProvider ();
-                provider.load_from_data (css_light, -1);
-                Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            } catch {}
         }
 
         construct {
@@ -479,6 +299,8 @@ namespace Rakugaki {
                     @define-color textColorPrimary %s;
                     @define-color textColorSecondary %s;
                     @define-color iconColorPrimary %s;
+                    @define-color titlePrimary %s;
+                    @define-color titleSecondary %s;
     
                     window.unified {
                         border-radius: 8px;
@@ -490,7 +312,7 @@ namespace Rakugaki {
                     }
     
                     .titlebutton image {
-                        color: @textColorPrimary;
+                        color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
     
@@ -500,16 +322,15 @@ namespace Rakugaki {
                     }
     
                     .dm-toolbar {
-                        background: @windowBackground;
-                        color: @textColorPrimary;
-                        -gtk-icon-shadow: none;
+                        background: @titlePrimary;
+                        color: @titleSecondary;
                         box-shadow: none;
                         border: none;
                         border-bottom: 1px solid alpha(black, 0.25);
                     }
     
                     .dm-toolbar .image-button {
-                        color: @textColorPrimary;
+                        color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
     
@@ -573,7 +394,7 @@ namespace Rakugaki {
                     .dm-clrbtn colorswatch {
                         border-radius: 8px;
                     }
-                    """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.f_high, this.b_high, this.f_inv);
+                    """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.f_high, this.b_high, this.f_inv, this.b_low, this.b_inv);
 
                     try {
                         var provider = new Gtk.CssProvider ();
@@ -620,6 +441,268 @@ namespace Rakugaki {
             settings.window_y = y;
             settings.window_maximize = is_maximized;
             return false;
+        }
+
+        public void change_theme () {
+            if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
+                t_background = "#000";
+                t_foreground = "#FFF";
+                background = "#181818";
+                f_high = "#F0E9EE";
+                f_med = "#90898E";
+                f_low = "#30393C";
+                f_inv = "#F0E9EE";
+                b_high = "#F0E9EE";
+                b_med = "#80797E";
+                b_low = "#333333";
+                b_inv = "#FFB545";
+                ui.line_color.parse (this.f_high);
+                ui.grid_main_dot_color.parse (this.b_med);
+                ui.grid_dot_color.parse (this.b_low);
+                ui.background_color.parse (this.background);
+                ui.line_color_button.rgba = ui.line_color;
+                ui.da.queue_draw ();
+                var provider = new Gtk.CssProvider ();
+                string css_light = """
+                    @define-color colorPrimary %s;
+                    @define-color colorSecondary %s;
+                    @define-color colorAccent %s;
+                    @define-color windowBackground %s;
+                    @define-color windowPrimary %s;
+                    @define-color textColorPrimary %s;
+                    @define-color textColorSecondary %s;
+                    @define-color iconColorPrimary %s;
+                    @define-color titlePrimary %s;
+                    @define-color titleSecondary %s;
+    
+                    window.unified {
+                        border-radius: 8px;
+                    }
+    
+                    .title {
+                        font-weight: 700;
+                        text-shadow: none;
+                    }
+    
+                    .titlebutton image {
+                        color: @titleSecondary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-window {
+                        background: @colorPrimary;
+                        color: @windowPrimary;
+                    }
+    
+                    .dm-toolbar {
+                        background: @titlePrimary;
+                        color: @titleSecondary;
+                        box-shadow: none;
+                        border: none;
+                        border-bottom: 1px solid alpha(black, 0.25);
+                    }
+    
+                    .dm-toolbar .image-button {
+                        color: @titleSecondary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-sidebar,
+                    .dm-sidebar .dm-box,
+                    .dm-sidebar titlebar {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        box-shadow: none;
+                        border: none;
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-tool {
+                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                        margin-bottom: 6px;
+                        border-radius: 8px;
+                    }
+    
+                    .dm-tool:hover {
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
+                    }
+    
+                    .dm-box image {
+                        color: alpha (@textColorPrimary, 0.66);
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-box button:not(.dm-tool):hover image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-box button:not(.dm-tool):active image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-reverse image {
+                        -gtk-icon-transform: rotate(180deg);
+                    }
+    
+                    .dm-grid {
+                        background: @colorPrimary;
+                    }
+    
+                    .dm-text {
+                        font-family: 'Cousine', Courier, monospace;
+                        font-size: 1.66em;
+                        color: @textColorPrimary;
+                    }
+    
+                    .dm-clrbtn {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        color: @textColorPrimary;
+                        box-shadow: 0 1px transparent inset;
+                        border: none;
+                    }
+    
+                    .dm-clrbtn:active {
+                        background: @colorAccent;
+                    }
+    
+                    .dm-clrbtn colorswatch {
+                        border-radius: 8px;
+                    }
+                    """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv, this.t_background, this.t_foreground);
+                try {
+                    provider.load_from_data (css_light, -1);
+                    Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+                } catch {}
+            } else if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.NO_PREFERENCE) {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+                t_background = "#FFF";
+                t_foreground = "#000";
+                background = "#F7F7F7";
+                f_high = "#30292E";
+                f_med = "#90898E";
+                f_low = "#C0B9BEC";
+                f_inv = "#30292E";
+                b_high = "#30292E";
+                b_med = "#80797E";
+                b_low = "#AAAAAA";
+                b_inv = "#FFB545";
+                ui.line_color.parse (this.f_high);
+                ui.grid_main_dot_color.parse (this.b_med);
+                ui.grid_dot_color.parse (this.b_low);
+                ui.background_color.parse (this.background);
+                ui.line_color_button.rgba = ui.line_color;
+                ui.da.queue_draw ();
+                var provider = new Gtk.CssProvider ();
+                string css_light = """
+                    @define-color colorPrimary %s;
+                    @define-color colorSecondary %s;
+                    @define-color colorAccent %s;
+                    @define-color windowBackground %s;
+                    @define-color windowPrimary %s;
+                    @define-color textColorPrimary %s;
+                    @define-color textColorSecondary %s;
+                    @define-color iconColorPrimary %s;
+                    @define-color titlePrimary %s;
+                    @define-color titleSecondary %s;
+    
+                    window.unified {
+                        border-radius: 8px;
+                    }
+    
+                    .title {
+                        font-weight: 700;
+                        text-shadow: none;
+                    }
+    
+                    .titlebutton image {
+                        color: @titleSecondary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-window {
+                        background: @colorPrimary;
+                        color: @windowPrimary;
+                    }
+    
+                    .dm-toolbar {
+                        background: @titlePrimary;
+                        color: @titleSecondary;
+                        box-shadow: none;
+                        border: none;
+                        border-bottom: 1px solid alpha(black, 0.25);
+                    }
+    
+                    .dm-toolbar .image-button {
+                        color: @titleSecondary;
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-sidebar,
+                    .dm-sidebar .dm-box,
+                    .dm-sidebar titlebar {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        box-shadow: none;
+                        border: none;
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-tool {
+                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                        margin-bottom: 6px;
+                        border-radius: 8px;
+                    }
+    
+                    .dm-tool:hover {
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
+                    }
+    
+                    .dm-box image {
+                        color: alpha (@textColorPrimary, 0.66);
+                        -gtk-icon-shadow: none;
+                    }
+    
+                    .dm-box button:not(.dm-tool):hover image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-box button:not(.dm-tool):active image {
+                        color: @iconColorPrimary;
+                    }
+    
+                    .dm-reverse image {
+                        -gtk-icon-transform: rotate(180deg);
+                    }
+    
+                    .dm-grid {
+                        background: @colorPrimary;
+                    }
+    
+                    .dm-text {
+                        font-family: 'Cousine', Courier, monospace;
+                        font-size: 1.66em;
+                        color: @textColorPrimary;
+                    }
+    
+                    .dm-clrbtn {
+                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        color: @textColorPrimary;
+                        box-shadow: 0 1px transparent inset;
+                        border: none;
+                    }
+    
+                    .dm-clrbtn:active {
+                        background: @colorAccent;
+                    }
+    
+                    .dm-clrbtn colorswatch {
+                        border-radius: 8px;
+                    }
+                    """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv, this.t_background, this.t_foreground);
+                try {
+                    provider.load_from_data (css_light, -1);
+                    Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+                } catch {}
+            }
         }
     }
 }
