@@ -18,6 +18,7 @@
 */
 namespace Rakugaki {
     public class MainWindow : Hdy.Window {
+        public Gtk.Application app { get; construct; }
         public Widgets.UI ui;
         public Hdy.HeaderBar titlebar;
         public Hdy.HeaderBar faux_titlebar;
@@ -34,8 +35,10 @@ namespace Rakugaki {
 
         // Global Color Palette
         public string background = "#F7F7F7";
+        public string t_background = "#FFF";
+        public string t_foreground = "#000";
         public string f_high = "#30292E";
-        public string f_med = "#90898e";
+        public string f_med = "#90898E";
         public string f_low = "#C0B9BEC";
         public string f_inv = "#30292E";
         public string b_high = "#30292E";
@@ -43,20 +46,99 @@ namespace Rakugaki {
         public string b_low = "#AAAAAA";
         public string b_inv = "#FFB545";
 
-
         private const Gtk.TargetEntry [] targets = {{
             "text/uri-list", 0, 0
         }};
 
         public MainWindow (Gtk.Application application) {
             Hdy.init ();
-            GLib.Object (
+
+            Object (
                 application: application,
+                app: application,
                 icon_name: "com.github.lainsce.rakugaki",
+                title: "Rakugaki",
                 height_request: 585,
-                width_request: 755,
-                title: (_("Rakugaki"))
+                width_request: 755
             );
+
+            if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
+                t_background = "#000";
+                t_foreground = "#FFF";
+                background = "#181818";
+                f_high = "#F0E9EE";
+                f_med = "#90898E";
+                f_low = "#30393C";
+                f_inv = "#F0E9EE";
+                b_high = "#F0E9EE";
+                b_med = "#80797E";
+                b_low = "#333333";
+                b_inv = "#FFB545";
+                ui.line_color.parse (this.f_high);
+                ui.grid_main_dot_color.parse (this.b_med);
+                ui.grid_dot_color.parse (this.b_low);
+                ui.background_color.parse (this.background);
+                ui.line_color_button.rgba = ui.line_color;
+            } else if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.NO_PREFERENCE) {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+                t_background = "#FFF";
+                t_foreground = "#000";
+                background = "#F7F7F7";
+                f_high = "#30292E";
+                f_med = "#90898E";
+                f_low = "#C0B9BEC";
+                f_inv = "#30292E";
+                b_high = "#30292E";
+                b_med = "#80797E";
+                b_low = "#AAAAAA";
+                b_inv = "#FFB545";
+                ui.line_color.parse (this.f_high);
+                ui.grid_main_dot_color.parse (this.b_med);
+                ui.grid_dot_color.parse (this.b_low);
+                ui.background_color.parse (this.background);
+                ui.line_color_button.rgba = ui.line_color;
+            }
+
+            Rakugaki.Application.grsettings.notify["prefers-color-scheme"].connect (() => {
+                if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
+                    Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = true;
+                    t_background = "#000";
+                    t_foreground = "#FFF";
+                    background = "#181818";
+                    f_high = "#F0E9EE";
+                    f_med = "#90898E";
+                    f_low = "#30393C";
+                    f_inv = "#F0E9EE";
+                    b_high = "#F0E9EE";
+                    b_med = "#80797E";
+                    b_low = "#333333";
+                    b_inv = "#FFB545";
+                    ui.line_color.parse (this.f_high);
+                    ui.grid_main_dot_color.parse (this.b_med);
+                    ui.grid_dot_color.parse (this.b_low);
+                    ui.background_color.parse (this.background);
+                    ui.line_color_button.rgba = ui.line_color;
+                } else if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.NO_PREFERENCE) {
+                    Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+                    t_background = "#FFF";
+                    t_foreground = "#000";
+                    background = "#F7F7F7";
+                    f_high = "#30292E";
+                    f_med = "#90898E";
+                    f_low = "#C0B9BEC";
+                    f_inv = "#30292E";
+                    b_high = "#30292E";
+                    b_med = "#80797E";
+                    b_low = "#AAAAAA";
+                    b_inv = "#FFB545";
+                    ui.line_color.parse (this.f_high);
+                    ui.grid_main_dot_color.parse (this.b_med);
+                    ui.grid_dot_color.parse (this.b_low);
+                    ui.background_color.parse (this.background);
+                    ui.line_color_button.rgba = ui.line_color;
+                }
+            });
 
             key_press_event.connect ((e) => {
                 uint keycode = e.hardware_keycode;
@@ -85,6 +167,8 @@ namespace Rakugaki {
                 @define-color textColorPrimary %s;
                 @define-color textColorSecondary %s;
                 @define-color iconColorPrimary %s;
+                @define-color titlePrimary %s;
+                @define-color titleSecondary %s;
 
                 window.unified {
                     border-radius: 8px;
@@ -96,7 +180,7 @@ namespace Rakugaki {
                 }
 
                 .titlebutton image {
-                    color: #000;
+                    color: @titleSecondary;
                     -gtk-icon-shadow: none;
                 }
 
@@ -106,15 +190,15 @@ namespace Rakugaki {
                 }
 
                 .dm-toolbar {
-                    background: #FFF;
-                    color: #000;
+                    background: @titlePrimary;
+                    color: @titleSecondary;
                     box-shadow: none;
                     border: none;
                     border-bottom: 1px solid alpha(black, 0.25);
                 }
 
                 .dm-toolbar .image-button {
-                    color: #000;
+                    color: @titleSecondary;
                     -gtk-icon-shadow: none;
                 }
 
@@ -178,7 +262,7 @@ namespace Rakugaki {
                 .dm-clrbtn colorswatch {
                     border-radius: 8px;
                 }
-                """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv);
+                """.printf(this.background, this.b_inv, this.b_med, this.b_inv, this.b_high, this.f_high, this.b_high, this.f_inv, this.t_background, this.t_foreground);
             try {
                 var provider = new Gtk.CssProvider ();
                 provider.load_from_data (css_light, -1);
@@ -250,11 +334,6 @@ namespace Rakugaki {
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
-            ui.line_color.parse (this.f_high);
-            ui.grid_main_dot_color.parse (this.b_med);
-			ui.grid_dot_color.parse (this.b_low);
-			ui.background_color.parse (this.background);
-			ui.line_color_button.rgba = ui.line_color;
             scrolled.add (ui);
             scrolled.expand = true;
 

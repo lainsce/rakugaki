@@ -20,10 +20,15 @@
 namespace Rakugaki {
     public class Application : Gtk.Application {
         public MainWindow window;
+        public static Granite.Settings grsettings;
 
         public Application () {
             Object (flags: ApplicationFlags.FLAGS_NONE,
             application_id: "com.github.lainsce.rakugaki");
+        }
+
+        construct {
+            grsettings = Granite.Settings.get_default ();
         }
 
         protected override void activate () {
