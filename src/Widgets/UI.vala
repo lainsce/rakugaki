@@ -295,6 +295,7 @@ namespace Rakugaki {
 				}
 				if (path.is_eraser) {
 					Gdk.cairo_set_source_rgba (cr, background_color);
+					cr.set_operator(Cairo.Operator.OVER);
 					cr.set_line_width (9);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
@@ -305,6 +306,7 @@ namespace Rakugaki {
 				}
 				if (!path.is_eraser && !path.is_halftone) {
 					Gdk.cairo_set_source_rgba (cr, line_color);
+					cr.set_operator(Cairo.Operator.OVER);
 					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
