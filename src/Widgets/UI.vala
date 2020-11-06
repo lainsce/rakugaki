@@ -265,33 +265,34 @@ namespace Rakugaki {
 		}
 
 		public void draws (Cairo.Context cr) {
-			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
+			cr.set_antialias (Cairo.Antialias.NONE);
 			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
 			cr.set_line_cap (Cairo.LineCap.ROUND);
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
-					cr.set_operator(Cairo.Operator.DIFFERENCE);
+					cr.set_operator(Cairo.Operator.SOURCE);
 					cr.set_line_width (1);
 					foreach (var point in path.points.next) {
 						int i, j;
 						int h = this.get_allocated_height ();
 						int w = this.get_allocated_width ();
 						for (i = 1; i <= w / (ratio*2); i++) {
-							for (j = 1; j <= h / (ratio+4); j++) {
+							for (j = 1; j <= h / (ratio*1.5); j++) {
 								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
 									cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 									cr.rectangle (point.x + i, point.y + j, 1, 1);
 									cr.fill ();
+									cr.stroke ();
 								} else {
 									cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
 									cr.rectangle (point.x + i, point.y + j, 1, 1);
 									cr.fill ();
+									cr.stroke ();
 								}
 							}
 						}
 					}
-					cr.stroke ();
 				}
 				if (path.is_eraser) {
 					Gdk.cairo_set_source_rgba (cr, background_color);

@@ -62,6 +62,8 @@ namespace Rakugaki {
                 width_request: 755
             );
 
+            change_theme ();
+
             if (Rakugaki.Application.grsettings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
                 change_theme ();
             }
