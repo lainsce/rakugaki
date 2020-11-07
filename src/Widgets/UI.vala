@@ -10,6 +10,7 @@ namespace Rakugaki {
 
 	public class Path {
 		public List<Point> points = null;
+		public bool is_dotter {get; set; default=false;}
 		public bool is_halftone {get; set; default=false;}
 		public bool is_eraser {get; set; default=false;}
 	}
@@ -42,6 +43,7 @@ namespace Rakugaki {
 		public bool dirty {get; set;}
 		public bool see_grid {get; set; default=true;}
 		public bool halftone {get; set; default=false;}
+		public bool dotter {get; set; default=false;}
 		public bool eraser {get; set; default=false;}
 
 		public UI (MainWindow win) {
@@ -60,15 +62,23 @@ namespace Rakugaki {
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
+				if (dotter) {
+					current_path = new Path ();
+					current_path.is_dotter = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
 				if (eraser) {
 					current_path = new Path ();
 					current_path.is_eraser = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
-				if (!halftone && !eraser) {
+				if (!halftone && !dotter && !eraser) {
 					current_path = new Path ();
 					current_path.is_halftone = false;
+					current_path.is_dotter = false;
+					current_path.is_eraser = false;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
@@ -195,6 +205,7 @@ namespace Rakugaki {
 			normal_button.clicked.connect ((e) => {
 				eraser = false;
 				halftone = false;
+				dotter = false;
             });
 
 			var halftone_button = new Gtk.Button ();
@@ -207,6 +218,21 @@ namespace Rakugaki {
 
 			halftone_button.clicked.connect ((e) => {
 				halftone = true;
+				dotter = false;
+				eraser = false;
+			});
+			
+			var dotter_button = new Gtk.Button ();
+            dotter_button.set_image (new Gtk.Image.from_icon_name ("line-cap-dotter-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			dotter_button.has_tooltip = true;
+			dotter_button.always_show_image = true;
+			dotter_button.tooltip_text = (_("Dotter"));
+			dotter_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			dotter_button.get_style_context ().add_class ("dm-tool");
+
+			dotter_button.clicked.connect ((e) => {
+				dotter = true;
+				halftone = false;
 				eraser = false;
             });
 
@@ -219,8 +245,9 @@ namespace Rakugaki {
 			eraser_button.get_style_context ().add_class ("dm-tool");
 
 			eraser_button.clicked.connect ((e) => {
-				halftone = false;
 				eraser = true;
+				dotter = false;
+				halftone = false;
             });
 
 			var separator = new Gtk.Grid ();
@@ -228,10 +255,11 @@ namespace Rakugaki {
 
 			box.attach (normal_button, 0, 0, 1, 1);
 			box.attach (halftone_button, 0, 1, 1, 1);
-			box.attach (eraser_button, 0, 2, 1, 1);
-			box.attach (separator, 0, 3, 1, 1);
-			box.attach (line_color_button, 0, 4, 1, 1);
-			box.attach (line_thickness_box, 0, 5, 1, 1);
+			box.attach (dotter_button, 0, 2, 1, 1);
+			box.attach (eraser_button, 0, 3, 1, 1);
+			box.attach (separator, 0, 4, 1, 1);
+			box.attach (line_color_button, 0, 5, 1, 1);
+			box.attach (line_thickness_box, 0, 6, 1, 1);
 
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");
@@ -271,22 +299,21 @@ namespace Rakugaki {
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			foreach (var path in paths) {
 				if (path.is_halftone) {
-					cr.set_operator(Cairo.Operator.SOURCE);
 					cr.set_line_width (1);
 					foreach (var point in path.points.next) {
 						int i, j;
 						int h = this.get_allocated_height ();
 						int w = this.get_allocated_width ();
 						for (i = 1; i <= w / (ratio*2); i++) {
-							for (j = 1; j <= h / (ratio*1.5); j++) {
+							for (j = 1; j <= h / (ratio*1.2); j++) {
 								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
 									cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-									cr.rectangle (point.x + i, point.y + j, 1, 1);
+									cr.rectangle (Math.floor((point.x+i)-(line_thickness/2)), Math.floor((point.y+j)-(line_thickness/2)), 1, 1);
 									cr.fill ();
 									cr.stroke ();
 								} else {
-									cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
-									cr.rectangle (point.x + i, point.y + j, 1, 1);
+									cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+									cr.rectangle (Math.floor((point.x+i)-(line_thickness/2)), Math.floor((point.y+j)-(line_thickness/2)), 1, 1);
 									cr.fill ();
 									cr.stroke ();
 								}
@@ -294,9 +321,25 @@ namespace Rakugaki {
 						}
 					}
 				}
+				if (path.is_dotter) {
+					cr.set_line_width (1);
+					foreach (var point in path.points.next) {
+						cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+						cr.rectangle (point.x, point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x+(ratio/2), point.y, 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x, point.y+(ratio/2), 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x+(ratio/2), point.y+(ratio/2), 1, 1);
+						cr.fill ();
+						cr.rectangle (point.x+(ratio/4), point.y+(ratio/4), 1, 1);
+						cr.fill ();
+					}
+					cr.stroke ();
+				}
 				if (path.is_eraser) {
 					Gdk.cairo_set_source_rgba (cr, background_color);
-					cr.set_operator(Cairo.Operator.OVER);
 					cr.set_line_width (9);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
@@ -305,9 +348,8 @@ namespace Rakugaki {
 					}
 					cr.stroke ();
 				}
-				if (!path.is_eraser && !path.is_halftone) {
+				if (!path.is_eraser && !path.is_halftone && !path.is_dotter) {
 					Gdk.cairo_set_source_rgba (cr, line_color);
-					cr.set_operator(Cairo.Operator.OVER);
 					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
@@ -334,7 +376,7 @@ namespace Rakugaki {
 					for (j = 0; j <= h / ratio; j++) {
 						if (i % 4 == 0 && j % 4 == 0) {
 							cr.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
-							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.5, 0, 2*Math.PI);
 							cr.fill ();
 						} else {
 							cr.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
