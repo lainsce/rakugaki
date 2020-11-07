@@ -41,7 +41,7 @@ namespace Rakugaki {
 		public Gdk.RGBA background_color;
 
 		public bool dirty {get; set;}
-		public bool see_grid {get; set; default=true;}
+		public bool see_grid {get; set; default=false;}
 		public bool halftone {get; set; default=false;}
 		public bool dotter {get; set; default=false;}
 		public bool eraser {get; set; default=false;}
@@ -278,21 +278,21 @@ namespace Rakugaki {
 			get_allocation (out allocation);
 			Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr2 = new Cairo.Context (sf2);
-			draws (cr2);
-
 			Cairo.ImageSurface sf3 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr3 = new Cairo.Context (sf3);
-			draw_grid (cr3);
-
 			cr.set_source_surface (cr2.get_target (), 0, 0);
+			draws (cr2);
 			cr.rectangle (0, 0, allocation.width, allocation.height);
 			cr.paint ();
 			cr.set_source_surface (cr3.get_target (), 0, 0);
+			draw_grid (cr3);
 			cr.rectangle (0, 0, allocation.width, allocation.height);
 			cr.paint ();
 		}
 
 		public void draws (Cairo.Context cr) {
+			cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
+        	cr.paint ();
 			cr.set_antialias (Cairo.Antialias.NONE);
 			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
 			cr.set_line_cap (Cairo.LineCap.ROUND);
@@ -300,43 +300,65 @@ namespace Rakugaki {
 			foreach (var path in paths) {
 				if (path.is_halftone) {
 					cr.set_line_width (1);
-					foreach (var point in path.points.next) {
-						int i, j;
-						int h = this.get_allocated_height ();
-						int w = this.get_allocated_width ();
-						for (i = 1; i <= w / (ratio*2); i++) {
-							for (j = 1; j <= h / (ratio*1.2); j++) {
-								if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
-									cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-									cr.rectangle (Math.floor((point.x+i)-(line_thickness/2)), Math.floor((point.y+j)-(line_thickness/2)), 1, 1);
-									cr.fill ();
-									cr.stroke ();
-								} else {
-									cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
-									cr.rectangle (Math.floor((point.x+i)-(line_thickness/2)), Math.floor((point.y+j)-(line_thickness/2)), 1, 1);
-									cr.fill ();
-									cr.stroke ();
-								}
+					Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 12, 16);
+					Cairo.Context p_cr = new Cairo.Context (p);
+					int i, j;
+					for (i = 1; i <= 13; i++) {
+						for (j = 1; j <= 16; j++) {
+							if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+								p_cr.new_path ();
+								p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+								p_cr.rectangle (i, j, 1, 1);
+								p_cr.fill ();
+								p_cr.stroke ();
+							} else {
+								p_cr.new_path ();
+								p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+								p_cr.rectangle (i, j, 1, 1);
+								p_cr.fill ();
+								p_cr.stroke ();
 							}
 						}
+					}
+					Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+					pn.set_extend (Cairo.Extend.REPEAT);
+					cr.set_antialias (Cairo.Antialias.NONE);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					foreach (var point in path.points.next) {
+						cr.mask_surface (p, Math.fabs(point.x), Math.fabs(point.y));
 					}
 				}
 				if (path.is_dotter) {
 					cr.set_line_width (1);
-					foreach (var point in path.points.next) {
-						cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-						cr.rectangle (point.x, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x+(ratio/2), point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x, point.y+(ratio/2), 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x+(ratio/2), point.y+(ratio/2), 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x+(ratio/4), point.y+(ratio/4), 1, 1);
-						cr.fill ();
+					Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 20, 20);
+					Cairo.Context p_cr = new Cairo.Context (p);
+					int i, j;
+					for (i = 1; i <= 20; i++) {
+						for (j = 1; j <= 20; j++) {
+							if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
+								(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6) ||
+								(i % Math.floor(ratio*2) == 0 && j % Math.floor(ratio*2) == 0)) {
+								p_cr.new_path ();
+								p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+								p_cr.rectangle (i, j, 1, 1);
+								p_cr.fill ();
+								p_cr.stroke ();
+							} else {
+								p_cr.new_path ();
+								p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+								p_cr.rectangle (i, j, 1, 1);
+								p_cr.fill ();
+								p_cr.stroke ();
+							}
+						}
 					}
-					cr.stroke ();
+					Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+					pn.set_extend (Cairo.Extend.REPEAT);
+					cr.set_antialias (Cairo.Antialias.NONE);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					foreach (var point in path.points.next) {
+						cr.mask_surface (p, Math.fabs(point.x), Math.fabs(point.y));
+					}
 				}
 				if (path.is_eraser) {
 					Gdk.cairo_set_source_rgba (cr, background_color);

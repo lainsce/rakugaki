@@ -335,6 +335,19 @@ namespace Rakugaki {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
+
+                    .dm-toolbar .image-button {
+                        border-radius: 8px;
+                    }
+                    
+                    .dm-toolbar .image-button image {
+                        padding: 0 6px;
+                    }
+                    
+                    .dm-toolbar .image-button:focus,
+                    .dm-toolbar .image-button:hover {
+                        background: shade(shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88), 0.95);
+                    }
     
                     .dm-sidebar,
                     .dm-sidebar .dm-box,
@@ -491,6 +504,19 @@ namespace Rakugaki {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
+
+                    .dm-toolbar .image-button {
+                        border-radius: 8px;
+                    }
+                    
+                    .dm-toolbar .image-button image {
+                        padding: 0 6px;
+                    }
+                    
+                    .dm-toolbar .image-button:focus,
+                    .dm-toolbar .image-button:hover {
+                        background: shade(@base_color, 0.95);
+                    }
     
                     .dm-window {
                         background: @colorPrimary;
@@ -637,6 +663,19 @@ namespace Rakugaki {
                     .dm-toolbar .image-button {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
+                    }
+
+                    .dm-toolbar .image-button {
+                        border-radius: 8px;
+                    }
+                    
+                    .dm-toolbar .image-button image {
+                        padding: 0 6px;
+                    }
+                    
+                    .dm-toolbar .image-button:focus,
+                    .dm-toolbar .image-button:hover {
+                        background: shade(@base_color, 0.95);
                     }
     
                     .dm-sidebar,
