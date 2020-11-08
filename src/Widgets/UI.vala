@@ -113,6 +113,8 @@ namespace Rakugaki {
 
 				da.queue_draw ();
 
+				current_path = null;
+
 				return false;
 			});
 
