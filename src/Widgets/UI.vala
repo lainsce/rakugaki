@@ -318,7 +318,7 @@ namespace Rakugaki {
 					cr.set_line_width (1);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					foreach (var point in path.points.next) {
-						for (int i = 0; i < path.points.length (); i+=1) {
+						for (int i = 0; i < path.points.length (); i++) {
 							int x = (int) Math.round(path.points.nth_data(i).x / 9) * 9;
 							int y = (int) Math.round(path.points.nth_data(i).y / 9) * 9;
 							cr.mask_surface (p_ht, x, y);
@@ -329,7 +329,7 @@ namespace Rakugaki {
 					cr.set_line_width (1);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					foreach (var point in path.points.next) {
-						for (int i = 0; i < path.points.length (); i+=1) {
+						for (int i = 0; i < path.points.length (); i++) {
 							int x = (int) Math.round(path.points.nth_data(i).x / 19) * 19;
 							int y = (int) Math.round(path.points.nth_data(i).y / 19) * 19;
 							cr.mask_surface (p_dt, x, y);
