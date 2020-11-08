@@ -297,35 +297,14 @@ namespace Rakugaki {
 			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
 			cr.set_line_cap (Cairo.LineCap.ROUND);
 			cr.set_line_join (Cairo.LineJoin.ROUND);
+			Cairo.ImageSurface p_ht = halftone_pattern ();
 			foreach (var path in paths) {
 				if (path.is_halftone) {
 					cr.set_line_width (1);
-					Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 12, 16);
-					Cairo.Context p_cr = new Cairo.Context (p);
-					int i, j;
-					for (i = 1; i <= 13; i++) {
-						for (j = 1; j <= 16; j++) {
-							if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
-								p_cr.new_path ();
-								p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-								p_cr.rectangle (i, j, 1, 1);
-								p_cr.fill ();
-								p_cr.stroke ();
-							} else {
-								p_cr.new_path ();
-								p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
-								p_cr.rectangle (i, j, 1, 1);
-								p_cr.fill ();
-								p_cr.stroke ();
-							}
-						}
-					}
-					Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
-					pn.set_extend (Cairo.Extend.REPEAT);
 					cr.set_antialias (Cairo.Antialias.NONE);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					foreach (var point in path.points.next) {
-						cr.mask_surface (p, Math.fabs(point.x), Math.fabs(point.y));
+						cr.mask_surface (p_ht, Math.fabs(point.x), Math.fabs(point.y));
 					}
 				}
 				if (path.is_dotter) {
@@ -407,6 +386,32 @@ namespace Rakugaki {
 					}
 				}
 			}
+		}
+
+		private Cairo.ImageSurface halftone_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 12, 16);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int i, j;
+			for (i = 1; i <= 13; i++) {
+				for (j = 1; j <= 16; j++) {
+					if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					} else {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
 		}
 
 		// IO Section
