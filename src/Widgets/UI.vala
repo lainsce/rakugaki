@@ -89,15 +89,29 @@ namespace Rakugaki {
 			da.button_release_event.connect ((e) => {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
-				double[] coordinates = new double[current_path.points.length () * 2];
-				int i = 0;
-				foreach (var point in current_path.points) {
-					coordinates[i] = point.x / (double)allocation.width;
-					coordinates[i + 1] = point.y / (double)allocation.height;
-				}
-				stroke_added (coordinates);
 
-				current_path = null;
+				double x = e.x.clamp ((double)allocation.x,
+										  (double)(allocation.x + allocation.width));
+				double y = e.y.clamp ((double)allocation.y,
+										  (double)(allocation.y + allocation.height));
+				Point last = current_path.points.last ().data;
+				double dx = Math.fabs(last.x - x);
+				double dy = Math.fabs(last.y - y);
+
+				// Thanks Neauoire! =)
+				double err = dx + dy;
+				double e2 = 2 * err;
+				if (e2 >= dy) {
+					err += dy; x += (x < last.x ? 1 : -1);
+					current_path.points.append (new Point (x, y));
+				}
+      			if (e2 <= dx) {
+					err += dx; y += (y < last.y ? 1 : -1);
+					current_path.points.append (new Point (x, y));
+				}
+				//
+
+				da.queue_draw ();
 
 				return false;
 			});
@@ -298,44 +312,28 @@ namespace Rakugaki {
 			cr.set_line_cap (Cairo.LineCap.ROUND);
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			Cairo.ImageSurface p_ht = halftone_pattern ();
+			Cairo.ImageSurface p_dt = dotter_pattern ();
 			foreach (var path in paths) {
 				if (path.is_halftone) {
 					cr.set_line_width (1);
-					cr.set_antialias (Cairo.Antialias.NONE);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					foreach (var point in path.points.next) {
-						cr.mask_surface (p_ht, Math.fabs(point.x), Math.fabs(point.y));
+						for (int i = 0; i < path.points.length (); i+=1) {
+							int x = (int) Math.round(path.points.nth_data(i).x / 9) * 9;
+							int y = (int) Math.round(path.points.nth_data(i).y / 9) * 9;
+							cr.mask_surface (p_ht, x, y);
+						}
 					}
 				}
 				if (path.is_dotter) {
 					cr.set_line_width (1);
-					Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 20, 20);
-					Cairo.Context p_cr = new Cairo.Context (p);
-					int i, j;
-					for (i = 1; i <= 20; i++) {
-						for (j = 1; j <= 20; j++) {
-							if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
-								(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6)) {
-								p_cr.new_path ();
-								p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-								p_cr.rectangle (i, j, 1, 1);
-								p_cr.fill ();
-								p_cr.stroke ();
-							} else {
-								p_cr.new_path ();
-								p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
-								p_cr.rectangle (i, j, 1, 1);
-								p_cr.fill ();
-								p_cr.stroke ();
-							}
-						}
-					}
-					Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
-					pn.set_extend (Cairo.Extend.REPEAT);
-					cr.set_antialias (Cairo.Antialias.NONE);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					foreach (var point in path.points.next) {
-						cr.mask_surface (p, Math.fabs(point.x), Math.fabs(point.y));
+						for (int i = 0; i < path.points.length (); i+=1) {
+							int x = (int) Math.round(path.points.nth_data(i).x / 19) * 19;
+							int y = (int) Math.round(path.points.nth_data(i).y / 19) * 19;
+							cr.mask_surface (p_dt, x, y);
+						}
 					}
 				}
 				if (path.is_eraser) {
@@ -389,12 +387,37 @@ namespace Rakugaki {
 		}
 
 		private Cairo.ImageSurface halftone_pattern () {
-			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 12, 16);
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 11, 11);
 			Cairo.Context p_cr = new Cairo.Context (p);
 			int i, j;
-			for (i = 1; i <= 13; i++) {
-				for (j = 1; j <= 16; j++) {
+			for (i = 1; i <= 11; i++) {
+				for (j = 1; j <= 11; j++) {
 					if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					} else {
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
+		}
+
+		private Cairo.ImageSurface dotter_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 20, 20);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int i, j;
+			for (i = 1; i <= 20; i++) {
+				for (j = 1; j <= 20; j++) {
+					if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
+						(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6)) {
 						p_cr.new_path ();
 						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 						p_cr.rectangle (i, j, 1, 1);
