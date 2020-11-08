@@ -336,8 +336,7 @@ namespace Rakugaki {
 					for (i = 1; i <= 20; i++) {
 						for (j = 1; j <= 20; j++) {
 							if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
-								(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6) ||
-								(i % Math.floor(ratio*2) == 0 && j % Math.floor(ratio*2) == 0)) {
+								(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6)) {
 								p_cr.new_path ();
 								p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 								p_cr.rectangle (i, j, 1, 1);
