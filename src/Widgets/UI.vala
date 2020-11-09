@@ -90,26 +90,11 @@ namespace Rakugaki {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
 
-				double x = e.x.clamp ((double)allocation.x,
-										  (double)(allocation.x + allocation.width));
-				double y = e.y.clamp ((double)allocation.y,
-										  (double)(allocation.y + allocation.height));
-				Point last = current_path.points.last ().data;
-				double dx = Math.fabs(last.x - x);
-				double dy = Math.fabs(last.y - y);
-
-				// Thanks Neauoire! =)
-				double err = dx + dy;
-				double e2 = 2 * err;
-				if (e2 >= dy) {
-					err += dy; x += (x < last.x ? 1 : -1);
-					current_path.points.append (new Point (x, y));
-				}
-      			if (e2 <= dx) {
-					err += dx; y += (y < last.y ? 1 : -1);
-					current_path.points.append (new Point (x, y));
-				}
-				//
+				double x = e.x.clamp ((double) allocation.x,
+									  (double) (allocation.x + allocation.width));
+				double y = e.y.clamp ((double) allocation.y,
+									  (double) (allocation.y + allocation.height));
+				current_path.points.append (new Point (x, y));
 
 				da.queue_draw ();
 
@@ -122,10 +107,10 @@ namespace Rakugaki {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
 
-				double x = e.x.clamp ((double)allocation.x,
-										  (double)(allocation.x + allocation.width));
-				double y = e.y.clamp ((double)allocation.y,
-										  (double)(allocation.y + allocation.height));
+				double x = e.x.clamp ((double) allocation.x,
+									  (double) (allocation.x + allocation.width));
+				double y = e.y.clamp ((double) allocation.y,
+									  (double) (allocation.y + allocation.height));
 				Point last = current_path.points.last ().data;
 				double dx = Math.fabs(last.x - x);
 				double dy = Math.fabs(last.y - y);
