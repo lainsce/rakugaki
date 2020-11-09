@@ -314,8 +314,8 @@ namespace Rakugaki {
 					cr.set_line_width (1);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					for (int i = 0; i < path.points.length (); i++) {
-						int x = (int) Math.round(path.points.nth_data(i).x / 19) * 19;
-						int y = (int) Math.round(path.points.nth_data(i).y / 19) * 19;
+						int x = (int) Math.round(path.points.nth_data(i).x / 12) * 12;
+						int y = (int) Math.round(path.points.nth_data(i).y / 12) * 12;
 						cr.mask_surface (p_dt, x, y);
 					}
 				}
@@ -370,11 +370,11 @@ namespace Rakugaki {
 		}
 
 		private Cairo.ImageSurface halftone_pattern () {
-			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 11, 11);
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 12, 12);
 			Cairo.Context p_cr = new Cairo.Context (p);
 			int i, j;
-			for (i = 1; i <= 11; i++) {
-				for (j = 1; j <= 11; j++) {
+			for (i = 1; i <= 12; i++) {
+				for (j = 1; j <= 12; j++) {
 					if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
 						p_cr.close_path ();
 						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
@@ -396,11 +396,11 @@ namespace Rakugaki {
 		}
 
 		private Cairo.ImageSurface dotter_pattern () {
-			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 20, 20);
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 15, 15);
 			Cairo.Context p_cr = new Cairo.Context (p);
 			int i, j;
-			for (i = 1; i <= 20; i++) {
-				for (j = 1; j <= 20; j++) {
+			for (i = 1; i <= 15; i++) {
+				for (j = 1; j <= 15; j++) {
 					if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
 						(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6)) {
 						p_cr.new_path ();
