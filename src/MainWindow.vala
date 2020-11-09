@@ -454,6 +454,15 @@ namespace Rakugaki {
             settings.window_x = x;
             settings.window_y = y;
             settings.window_maximize = is_maximized;
+
+            if (ui.dirty) {
+                try {
+					ui.clear ();
+				} catch (Error e) {
+					warning ("Unexpected error during save: " + e.message);
+				}
+            }
+
             return false;
         }
 
