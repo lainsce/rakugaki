@@ -304,23 +304,19 @@ namespace Rakugaki {
 				if (path.is_halftone) {
 					cr.set_line_width (1);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-					foreach (var point in path.points.next) {
-						for (int i = 0; i < path.points.length (); i++) {
-							int x = (int) Math.round(path.points.nth_data(i).x / 9) * 9;
-							int y = (int) Math.round(path.points.nth_data(i).y / 9) * 9;
-							cr.mask_surface (p_ht, x, y);
-						}
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(path.points.nth_data(i).x / 9) * 9;
+						int y = (int) Math.round(path.points.nth_data(i).y / 9) * 9;
+						cr.mask_surface (p_ht, x, y);
 					}
 				}
 				if (path.is_dotter) {
 					cr.set_line_width (1);
 					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
-					foreach (var point in path.points.next) {
-						for (int i = 0; i < path.points.length (); i++) {
-							int x = (int) Math.round(path.points.nth_data(i).x / 19) * 19;
-							int y = (int) Math.round(path.points.nth_data(i).y / 19) * 19;
-							cr.mask_surface (p_dt, x, y);
-						}
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(path.points.nth_data(i).x / 19) * 19;
+						int y = (int) Math.round(path.points.nth_data(i).y / 19) * 19;
+						cr.mask_surface (p_dt, x, y);
 					}
 				}
 				if (path.is_eraser) {
@@ -328,8 +324,8 @@ namespace Rakugaki {
 					cr.set_line_width (9);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
-					foreach (var point in path.points.next) {
-						cr.line_to (point.x, point.y);
+					for (int i = 0; i < path.points.length (); i++) {
+						cr.line_to (path.points.nth_data(i).x, path.points.nth_data(i).y);
 					}
 					cr.stroke ();
 				}
@@ -338,8 +334,8 @@ namespace Rakugaki {
 					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
-					foreach (var point in path.points.next) {
-						cr.line_to (point.x, point.y);
+					for (int i = 0; i < path.points.length (); i++) {
+						cr.line_to (path.points.nth_data(i).x, path.points.nth_data(i).y);
 					}
 					cr.stroke ();
 				}
@@ -380,11 +376,13 @@ namespace Rakugaki {
 			for (i = 1; i <= 11; i++) {
 				for (j = 1; j <= 11; j++) {
 					if ((i % 3 == 0 && j % 6 == 0) || (i % 3 == 2 && j % 6 == 3)) {
+						p_cr.close_path ();
 						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 						p_cr.rectangle (i, j, 1, 1);
 						p_cr.fill ();
 						p_cr.stroke ();
 					} else {
+						p_cr.close_path ();
 						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
 						p_cr.rectangle (i, j, 1, 1);
 						p_cr.fill ();
