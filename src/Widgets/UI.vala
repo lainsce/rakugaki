@@ -142,6 +142,7 @@ namespace Rakugaki {
 			box.orientation = Gtk.Orientation.VERTICAL;
 			box.margin = 12;
 			box.vexpand = true;
+			box.set_size_request (90,-1);
 			box.get_style_context ().add_class ("dm-box");
 
 			line_color_button = new Gtk.ColorButton ();
@@ -191,7 +192,7 @@ namespace Rakugaki {
 				}
 			});
 
-			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
+			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 			line_thickness_box.pack_start (line_thickness_button);
 			line_thickness_box.pack_start (line_thickness_label);
 

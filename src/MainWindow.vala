@@ -190,7 +190,6 @@ namespace Rakugaki {
             sgrid.get_style_context ().add_class ("dm-sidebar");
             sgrid.attach (faux_titlebar, 0, 0, 1, 1);
             sgrid.attach (ui.box, 0, 1, 1, 1);
-            sgrid.set_size_request (90,-1);
             sgrid.show_all ();
 
             main_frame_grid = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -464,11 +463,11 @@ namespace Rakugaki {
                 t_background = "#000";
                 t_foreground = "#FFF";
                 background = "#181818";
-                f_high = "#F0E9EE";
+                f_high = "#e9eef0";
                 f_med = "#90898E";
                 f_low = "#30393C";
-                f_inv = "#F0E9EE";
-                b_high = "#F0E9EE";
+                f_inv = "#e9eef0";
+                b_high = "#e9eef0";
                 b_med = "#80797E";
                 b_low = "#333333";
                 b_inv = "#FFB545";
@@ -552,7 +551,7 @@ namespace Rakugaki {
                     }
     
                     .dm-tool:hover {
-                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
                     }
     
                     .dm-box image {

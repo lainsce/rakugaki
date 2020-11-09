@@ -78,14 +78,13 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
         size_group.add_widget (edit_button);
 
         grid = new Gtk.Grid ();
-        grid.column_spacing = 6;
         grid.add (title);
         grid.add (button_revealer);
 
         entry = new Gtk.Entry ();
         entry.hexpand = false;
         entry.halign = Gtk.Align.CENTER;
-        entry.width_chars = 4;
+        entry.width_chars = 2;
         var entry_style_context = entry.get_style_context ();
         entry_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
 
