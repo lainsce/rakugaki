@@ -2,6 +2,11 @@ project('com.github.lainsce.rakugaki', ['vala', 'c'], version: '2.0.0')
 gnome = import('gnome')
 i18n = import('i18n')
 
+add_project_arguments([
+		'--target-glib=2.40',
+	],
+	language: 'vala',
+)
 add_project_arguments(
     '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
     language: 'c'
@@ -23,9 +28,12 @@ asresources = gnome.compile_resources(
 )
 
 dependencies = [
+    dependency('gio-2.0'),
     dependency('gtk+-3.0'),
+    dependency('glib-2.0'),
     dependency('gobject-2.0'),
-    dependency('libhandy-1', version: '>=0.80.0'),
+    dependency('gee-0.8'),
+    dependency('libhandy-1'),
     dependency('granite'),
     meson.get_compiler('c').find_library('m', required: true)
 ]
