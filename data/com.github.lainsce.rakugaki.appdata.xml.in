@@ -63,9 +63,11 @@
     <releases>
         <release version="2.0.0" date="2020-??-??">
             <description>
-                <p>Release: Aki</p>
+                <p>Release: Jinmenken</p>
                 <ul>
                     <li>New: Hello Odin!</li>
+                    <li>Fixed: Halftoner behaviour.</li>
+                    <li>Added: Light Halftoner called Dotter.</li>
                 </ul>
             </description>
         </release>
