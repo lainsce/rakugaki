@@ -4,6 +4,7 @@
         <file alias="line-thickness-symbolic.svg">icons/symbolic/line-thickness-symbolic.svg</file>
         <file alias="grid-dots-symbolic.svg">icons/symbolic/grid-dots-symbolic.svg</file>
         <file alias="line-cap-dotter-symbolic.svg">icons/symbolic/line-cap-dotter-symbolic.svg</file>
+        <file alias="line-cap-plusser-symbolic.svg">icons/symbolic/line-cap-plusser-symbolic.svg</file>
         <file alias="line-cap-halftone-symbolic.svg">icons/symbolic/line-cap-halftone-symbolic.svg</file>
         <file alias="line-cap-normal-symbolic.svg">icons/symbolic/line-cap-normal-symbolic.svg</file>
         <file alias="eraser-symbolic.svg">icons/symbolic/eraser-symbolic.svg</file>

@@ -13,6 +13,8 @@ namespace Rakugaki {
 		public bool is_dotter {get; set; default=false;}
 		public bool is_halftone {get; set; default=false;}
 		public bool is_eraser {get; set; default=false;}
+		public bool is_plusser {get; set; default=false;}
+		public bool is_pen {get; set; default=false;}
 	}
 
 	public class DrawingArea : Gtk.DrawingArea {
@@ -42,8 +44,10 @@ namespace Rakugaki {
 
 		public bool dirty {get; set;}
 		public bool see_grid {get; set; default=false;}
+		public bool pen {get; set; default=true;}
 		public bool halftone {get; set; default=false;}
 		public bool dotter {get; set; default=false;}
+		public bool plusser {get; set; default=false;}
 		public bool eraser {get; set; default=false;}
 
 		public UI (MainWindow win) {
@@ -68,17 +72,21 @@ namespace Rakugaki {
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
+				if (plusser) {
+					current_path = new Path ();
+					current_path.is_plusser = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
 				if (eraser) {
 					current_path = new Path ();
 					current_path.is_eraser = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
-				if (!halftone && !dotter && !eraser) {
+				if (pen) {
 					current_path = new Path ();
-					current_path.is_halftone = false;
-					current_path.is_dotter = false;
-					current_path.is_eraser = false;
+					current_path.is_pen = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
@@ -208,6 +216,8 @@ namespace Rakugaki {
 				eraser = false;
 				halftone = false;
 				dotter = false;
+				plusser = false;
+				pen = true;
             });
 
 			var halftone_button = new Gtk.Button ();
@@ -222,6 +232,8 @@ namespace Rakugaki {
 				halftone = true;
 				dotter = false;
 				eraser = false;
+				plusser = false;
+				pen = false;
 			});
 			
 			var dotter_button = new Gtk.Button ();
@@ -236,6 +248,24 @@ namespace Rakugaki {
 				dotter = true;
 				halftone = false;
 				eraser = false;
+				plusser = false;
+				pen = false;
+			});
+			
+			var plusser_button = new Gtk.Button ();
+            plusser_button.set_image (new Gtk.Image.from_icon_name ("line-cap-plusser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			plusser_button.has_tooltip = true;
+			plusser_button.always_show_image = true;
+			plusser_button.tooltip_text = (_("Plus Pen"));
+			plusser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			plusser_button.get_style_context ().add_class ("dm-tool");
+
+			plusser_button.clicked.connect ((e) => {
+				plusser = true;
+				halftone = false;
+				eraser = false;
+				dotter = false;
+				pen = false;
             });
 
 			var eraser_button = new Gtk.Button ();
@@ -250,6 +280,8 @@ namespace Rakugaki {
 				eraser = true;
 				dotter = false;
 				halftone = false;
+				plusser = false;
+				pen = false;
             });
 
 			var separator = new Gtk.Grid ();
@@ -258,21 +290,22 @@ namespace Rakugaki {
 			box.attach (normal_button, 0, 0, 1, 1);
 			box.attach (halftone_button, 0, 1, 1, 1);
 			box.attach (dotter_button, 0, 2, 1, 1);
-			box.attach (eraser_button, 0, 3, 1, 1);
-			box.attach (separator, 0, 4, 1, 1);
-			box.attach (line_color_button, 0, 5, 1, 1);
-			box.attach (line_thickness_box, 0, 6, 1, 1);
+			box.attach (plusser_button, 0, 3, 1, 1);
+			box.attach (eraser_button, 0, 4, 1, 1);
+			box.attach (separator, 0, 5, 1, 1);
+			box.attach (line_color_button, 0, 6, 1, 1);
+			box.attach (line_thickness_box, 0, 7, 1, 1);
 
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");
 			show_all ();
 
 			da.stroke_added.connect ((coordinates) => {
-					stroke_added (coordinates);
-				});
+				stroke_added (coordinates);
+			});
 			da.stroke_removed.connect ((n_strokes) => {
-					stroke_removed (n_strokes);
-				});
+				stroke_removed (n_strokes);
+			});
 		}
 
 		public void main_draw (Cairo.Context cr) {
@@ -301,6 +334,7 @@ namespace Rakugaki {
 			cr.set_line_join (Cairo.LineJoin.ROUND);
 			Cairo.ImageSurface p_ht = halftone_pattern ();
 			Cairo.ImageSurface p_dt = dotter_pattern ();
+			Cairo.ImageSurface p_pt = plusser_pattern ();
 			foreach (var path in paths) {
 				if (path.is_halftone) {
 					cr.set_line_width (1);
@@ -320,6 +354,15 @@ namespace Rakugaki {
 						cr.mask_surface (p_dt, x, y);
 					}
 				}
+				if (path.is_plusser) {
+					cr.set_line_width (1);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(Math.floor(path.points.nth_data(i).x - (line_thickness / 2)) / 11) * 11;
+						int y = (int) Math.round(Math.floor(path.points.nth_data(i).y - (line_thickness / 2)) / 11) * 11;
+						cr.mask_surface (p_pt, x, y);
+					}
+				}
 				if (path.is_eraser) {
 					Gdk.cairo_set_source_rgba (cr, background_color);
 					cr.set_line_width (9);
@@ -330,7 +373,7 @@ namespace Rakugaki {
 					}
 					cr.stroke ();
 				}
-				if (!path.is_eraser && !path.is_halftone && !path.is_dotter) {
+				if (path.is_pen) {
 					Gdk.cairo_set_source_rgba (cr, line_color);
 					cr.set_line_width (line_thickness);
 					Point first = path.points.first ().data;
@@ -410,6 +453,38 @@ namespace Rakugaki {
 						p_cr.fill ();
 						p_cr.stroke ();
 					} else {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
+		}
+
+		private Cairo.ImageSurface plusser_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 8, 8);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int i, j;
+			for (i = 1; i <= 8; i++) {
+				for (j = 1; j <= 8; j++) {
+					if (i % 4 == 0) {
+						p_cr.new_path ();
+                        p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+                        p_cr.rectangle (i, j, 1, 1);
+                        p_cr.fill ();
+                        p_cr.stroke ();
+					} else if (j % 4 == 0) {
+                        p_cr.new_path ();
+                        p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+                        p_cr.rectangle (i, j, 1, 1);
+                        p_cr.fill ();
+                        p_cr.stroke ();
+                    } else {
 						p_cr.new_path ();
 						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
 						p_cr.rectangle (i, j, 1, 1);

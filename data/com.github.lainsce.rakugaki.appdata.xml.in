@@ -68,6 +68,7 @@
                     <li>New: Hello Odin!</li>
                     <li>Fixed: Halftoner behaviour.</li>
                     <li>Added: Light Halftoner called Dotter.</li>
+                    <li>Added: A pen which does a plus pattern.</li>
                 </ul>
             </description>
         </release>
