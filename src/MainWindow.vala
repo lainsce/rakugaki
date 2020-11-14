@@ -141,7 +141,7 @@ namespace Rakugaki {
             titlebar.pack_start (undo_button);
 
             var see_grid_button = new Gtk.Button ();
-			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
 			see_grid_button.has_tooltip = true;
 			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
             
