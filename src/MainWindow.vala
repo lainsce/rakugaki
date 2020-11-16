@@ -150,9 +150,10 @@ namespace Rakugaki {
             faux_titlebar = new Hdy.HeaderBar ();
             faux_titlebar.show_close_button = true;
             faux_titlebar.has_subtitle = false;
+            faux_titlebar.margin_top = faux_titlebar.margin_left = 6;
             var faux_titlebar_style_context = faux_titlebar.get_style_context ();
             faux_titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            faux_titlebar_style_context.add_class ("dm-sidebar");
+            faux_titlebar_style_context.remove_class ("titlebar");
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
@@ -292,122 +293,125 @@ namespace Rakugaki {
                         }
                     } while (match.next ());
                     string css_light = """
-                    @define-color colorPrimary %s;
-                    @define-color colorSecondary %s;
-                    @define-color colorAccent %s;
-                    @define-color windowBackground %s;
-                    @define-color windowPrimary %s;
-                    @define-color textColorPrimary %s;
-                    @define-color textColorSecondary %s;
-                    @define-color iconColorPrimary %s;
-                    @define-color titlePrimary %s;
-                    @define-color titleSecondary %s;
-    
-                    window.unified {
-                        border-radius: 8px;
-                    }
-    
-                    .title {
-                        font-weight: 700;
-                        text-shadow: none;
-                    }
-    
-                    .titlebutton image {
-                        color: @titleSecondary;
-                        -gtk-icon-shadow: none;
-                    }
-    
-                    .dm-window {
-                        background: @colorPrimary;
-                        color: @windowPrimary;
-                    }
-    
-                    .dm-toolbar {
-                        background: @titlePrimary;
-                        color: @titleSecondary;
-                        box-shadow: none;
-                        border: none;
-                        border-bottom: 1px solid alpha(black, 0.25);
-                    }
-    
-                    .dm-toolbar .image-button {
-                        color: @titleSecondary;
-                        -gtk-icon-shadow: none;
-                    }
+                        @define-color colorPrimary %s;
+                        @define-color colorSecondary %s;
+                        @define-color colorAccent %s;
+                        @define-color windowBackground %s;
+                        @define-color windowPrimary %s;
+                        @define-color textColorPrimary %s;
+                        @define-color textColorSecondary %s;
+                        @define-color iconColorPrimary %s;
+                        @define-color titlePrimary %s;
+                        @define-color titleSecondary %s;
+        
+                        window.unified {
+                            border-radius: 8px;
+                        }
+        
+                        .title {
+                            font-weight: 700;
+                            text-shadow: none;
+                        }
+        
+                        .titlebutton image {
+                            color: @titleSecondary;
+                            -gtk-icon-shadow: none;
+                        }
 
-                    .dm-toolbar .image-button {
-                        border-radius: 8px;
-                    }
-                    
-                    .dm-toolbar .image-button image {
-                        padding: 0 6px;
-                    }
-                    
-                    .dm-toolbar .image-button:focus,
-                    .dm-toolbar .image-button:hover {
-                        background: shade(shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88), 0.95);
-                    }
-    
-                    .dm-sidebar,
-                    .dm-sidebar .dm-box,
-                    .dm-sidebar titlebar {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
-                        box-shadow: none;
-                        border: none;
-                        color: @iconColorPrimary;
-                    }
-    
-                    .dm-tool {
-                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
-                        margin-bottom: 6px;
-                        border-radius: 8px;
-                    }
-    
-                    .dm-tool:hover {
-                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
-                    }
-    
-                    .dm-box image {
-                        color: alpha (@textColorPrimary, 0.66);
-                        -gtk-icon-shadow: none;
-                    }
-    
-                    .dm-box button:not(.dm-tool):hover image {
-                        color: @iconColorPrimary;
-                    }
-    
-                    .dm-box button:not(.dm-tool):active image {
-                        color: @iconColorPrimary;
-                    }
-    
-                    .dm-reverse image {
-                        -gtk-icon-transform: rotate(180deg);
-                    }
-    
-                    .dm-grid {
-                        background: @colorPrimary;
-                    }
-    
-                    .dm-text {
-                        font-family: 'Cousine', Courier, monospace;
-                        font-size: 1.66em;
-                        color: @textColorPrimary;
-                    }
-    
-                    .dm-clrbtn {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
-                        color: @textColorPrimary;
-                        box-shadow: 0 1px transparent inset;
-                        border: none;
-                    }
-    
-                    .dm-clrbtn:active {
-                        background: @colorAccent;
-                    }
-    
-                    .dm-clrbtn colorswatch {
-                        border-radius: 8px;
-                    }
+                        .dm-toolbar .image-button {
+                            border-radius: 8px;
+                        }
+                        
+                        .dm-toolbar .image-button image {
+                            padding: 0 6px;
+                        }
+                        
+                        .dm-toolbar .image-button:focus,
+                        .dm-toolbar .image-button:hover {
+                            background: shade(@base_color, 0.95);
+                        }
+        
+                        .dm-window {
+                            background: @colorPrimary;
+                            color: @windowPrimary;
+                        }
+        
+                        .dm-toolbar {
+                            background: @titlePrimary;
+                            color: @titleSecondary;
+                            box-shadow: none;
+                            border: none;
+                            border-bottom: 1px solid alpha(black, 0.25);
+                        }
+        
+                        .dm-toolbar .image-button {
+                            color: @titleSecondary;
+                            -gtk-icon-shadow: none;
+                        }
+        
+                        .dm-sidebar {
+                            background: mix (@colorSecondary, @colorPrimary, 0.85);
+                            box-shadow: none;
+                            border: none;
+                            border-right: 1px solid alpha(black, 0.25);
+                            color: @iconColorPrimary;
+                        }
+        
+                        .dm-tool {
+                            border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                            margin-bottom: 6px;
+                            border-radius: 8px;
+                        }
+        
+                        .dm-tool:hover {
+                            border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                        }
+
+                        .dm-box {
+                            border: none;
+                        }
+        
+                        .dm-box image {
+                            color: alpha (@textColorPrimary, 0.66);
+                            -gtk-icon-shadow: none;
+                        }
+        
+                        .dm-box button:not(.dm-tool):hover image {
+                            color: @iconColorPrimary;
+                        }
+        
+                        .dm-box button:not(.dm-tool):active image {
+                            color: @iconColorPrimary;
+                        }
+        
+                        .dm-reverse image {
+                            -gtk-icon-transform: rotate(180deg);
+                        }
+        
+                        .dm-grid {
+                            background: @colorPrimary;
+                        }
+        
+                        .dm-text {
+                            font-family: 'Cousine', Courier, monospace;
+                            font-size: 1.66em;
+                            color: @textColorPrimary;
+                        }
+        
+                        .dm-clrbtn {
+                            background: mix (@colorSecondary, @colorPrimary, 0.85);
+                            color: @textColorPrimary;
+                            box-shadow: 0 1px transparent inset;
+                            border: none;
+                        }
+        
+                        .dm-clrbtn:active {
+                            background: @colorAccent;
+                        }
+        
+                        .dm-clrbtn colorswatch {
+                            border-radius: 8px;
+                        }
                     """.printf(this.background, this.b_inv, this.b_med, this.b_high, this.b_high, this.f_high, this.b_high, this.f_inv, this.b_low, this.b_inv);
 
                     try {
@@ -475,7 +479,7 @@ namespace Rakugaki {
                 b_high = "#e9eef0";
                 b_med = "#80797E";
                 b_low = "#333333";
-                b_inv = "#FFB545";
+                b_inv = "#90898e";
                 ui.line_color.parse (this.f_high);
                 ui.grid_main_dot_color.parse (this.b_med);
                 ui.grid_dot_color.parse (this.b_low);
@@ -540,12 +544,11 @@ namespace Rakugaki {
                         -gtk-icon-shadow: none;
                     }
     
-                    .dm-sidebar,
-                    .dm-sidebar .dm-box,
-                    .dm-sidebar titlebar {
+                    .dm-sidebar {
                         background: mix (@colorSecondary, @colorPrimary, 0.85);
                         box-shadow: none;
                         border: none;
+                        border-right: 1px solid alpha(black, 0.25);
                         color: @iconColorPrimary;
                     }
     
@@ -557,6 +560,10 @@ namespace Rakugaki {
     
                     .dm-tool:hover {
                         border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                    }
+
+                    .dm-box {
+                        border: none;
                     }
     
                     .dm-box image {
@@ -617,7 +624,7 @@ namespace Rakugaki {
                 b_high = "#30292E";
                 b_med = "#80797E";
                 b_low = "#AAAAAA";
-                b_inv = "#FFB545";
+                b_inv = "#90898e";
                 ui.line_color.parse (this.f_high);
                 ui.grid_main_dot_color.parse (this.b_med);
                 ui.grid_dot_color.parse (this.b_low);
@@ -636,35 +643,17 @@ namespace Rakugaki {
                     @define-color iconColorPrimary %s;
                     @define-color titlePrimary %s;
                     @define-color titleSecondary %s;
-    
+
                     window.unified {
                         border-radius: 8px;
                     }
-    
+
                     .title {
                         font-weight: 700;
                         text-shadow: none;
                     }
-    
+
                     .titlebutton image {
-                        color: @titleSecondary;
-                        -gtk-icon-shadow: none;
-                    }
-    
-                    .dm-window {
-                        background: @colorPrimary;
-                        color: @windowPrimary;
-                    }
-    
-                    .dm-toolbar {
-                        background: @titlePrimary;
-                        color: @titleSecondary;
-                        box-shadow: none;
-                        border: none;
-                        border-bottom: 1px solid alpha(black, 0.25);
-                    }
-    
-                    .dm-toolbar .image-button {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
@@ -681,64 +670,85 @@ namespace Rakugaki {
                     .dm-toolbar .image-button:hover {
                         background: shade(@base_color, 0.95);
                     }
-    
-                    .dm-sidebar,
-                    .dm-sidebar .dm-box,
-                    .dm-sidebar titlebar {
+
+                    .dm-window {
+                        background: @colorPrimary;
+                        color: @windowPrimary;
+                    }
+
+                    .dm-toolbar {
+                        background: @titlePrimary;
+                        color: @titleSecondary;
+                        box-shadow: none;
+                        border: none;
+                        border-bottom: 1px solid alpha(black, 0.25);
+                    }
+
+                    .dm-toolbar .image-button {
+                        color: @titleSecondary;
+                        -gtk-icon-shadow: none;
+                    }
+
+                    .dm-sidebar {
                         background: mix (@colorSecondary, @colorPrimary, 0.85);
                         box-shadow: none;
                         border: none;
+                        border-right: 1px solid alpha(black, 0.25);
                         color: @iconColorPrimary;
                     }
-    
+
                     .dm-tool {
                         border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
                         margin-bottom: 6px;
                         border-radius: 8px;
                     }
-    
+
                     .dm-tool:hover {
-                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 0.88);
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
                     }
-    
+
+                    .dm-box {
+                        border: none;
+                    }
+
                     .dm-box image {
                         color: alpha (@textColorPrimary, 0.66);
                         -gtk-icon-shadow: none;
                     }
-    
+
                     .dm-box button:not(.dm-tool):hover image {
                         color: @iconColorPrimary;
                     }
-    
+
                     .dm-box button:not(.dm-tool):active image {
                         color: @iconColorPrimary;
                     }
-    
+
                     .dm-reverse image {
                         -gtk-icon-transform: rotate(180deg);
                     }
-    
+
                     .dm-grid {
                         background: @colorPrimary;
                     }
-    
+
                     .dm-text {
                         font-family: 'Cousine', Courier, monospace;
                         font-size: 1.66em;
                         color: @textColorPrimary;
                     }
-    
+
                     .dm-clrbtn {
                         background: mix (@colorSecondary, @colorPrimary, 0.85);
                         color: @textColorPrimary;
                         box-shadow: 0 1px transparent inset;
                         border: none;
                     }
-    
+
                     .dm-clrbtn:active {
                         background: @colorAccent;
                     }
-    
+
                     .dm-clrbtn colorswatch {
                         border-radius: 8px;
                     }
