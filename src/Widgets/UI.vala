@@ -148,7 +148,8 @@ namespace Rakugaki {
 
 			box = new Gtk.Grid ();
 			box.orientation = Gtk.Orientation.VERTICAL;
-			box.margin = 12;
+            box.margin = 12;
+            box.margin_top = 0;
 			box.vexpand = true;
 			box.set_size_request (90,-1);
 			box.get_style_context ().add_class ("dm-box");
@@ -168,13 +169,12 @@ namespace Rakugaki {
 
 			var line_thickness_button = new Gtk.Button ();
 			line_thickness_button.set_image (new Gtk.Image.from_icon_name ("line-thickness-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			line_thickness_button.has_tooltip = true;
-			line_thickness_button.tooltip_text = (_("Change Line Thickness"));
+            line_thickness_button.has_tooltip = true;
+            line_thickness_button.margin_bottom = 3;
+            line_thickness_button.tooltip_text = (_("Change Line Thickness"));
+
 			line_thickness_label = new EditableLabel (line_thickness.to_string());
 			line_thickness_label.get_style_context ().add_class ("dm-text");
-			line_thickness_label.valign = Gtk.Align.CENTER;
-			line_thickness_label.hexpand = false;
-			line_thickness_label.margin_top = 3;
 
 			line_thickness_button.clicked.connect ((e) => {
 				if (line_thickness < 50) {
@@ -285,16 +285,25 @@ namespace Rakugaki {
             });
 
 			var separator = new Gtk.Grid ();
-			separator.vexpand = true;
+            separator.vexpand = true;
+            
+            var sidebar_header = new Gtk.Label (null);
+            sidebar_header.get_style_context ().add_class (Granite.STYLE_CLASS_H4_LABEL);
+            sidebar_header.use_markup = true;
+            sidebar_header.halign = Gtk.Align.START;
+            sidebar_header.margin_start = 3;
+            sidebar_header.margin_top = 6;
+            sidebar_header.label = _("TOOLS");
 
-			box.attach (normal_button, 0, 0, 1, 1);
-			box.attach (halftone_button, 0, 1, 1, 1);
-			box.attach (dotter_button, 0, 2, 1, 1);
-			box.attach (plusser_button, 0, 3, 1, 1);
-			box.attach (eraser_button, 0, 4, 1, 1);
-			box.attach (separator, 0, 5, 1, 1);
-			box.attach (line_color_button, 0, 6, 1, 1);
-			box.attach (line_thickness_box, 0, 7, 1, 1);
+            box.attach (sidebar_header, 0, 0, 1, 1);
+			box.attach (normal_button, 0, 1, 1, 1);
+			box.attach (halftone_button, 0, 2, 1, 1);
+			box.attach (dotter_button, 0, 3, 1, 1);
+			box.attach (plusser_button, 0, 4, 1, 1);
+			box.attach (eraser_button, 0, 5, 1, 1);
+			box.attach (separator, 0, 6, 1, 1);
+			box.attach (line_color_button, 0, 7, 1, 1);
+			box.attach (line_thickness_box, 0, 8, 1, 1);
 
 			this.pack_start (da, true, true, 0);
 			this.get_style_context ().add_class ("dm-grid");

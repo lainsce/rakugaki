@@ -55,42 +55,34 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
     }
 
     public EditableLabel (string? title_name) {
-        valign = Gtk.Align.CENTER;
-        hexpand = false;
         events |= Gdk.EventMask.ENTER_NOTIFY_MASK;
         events |= Gdk.EventMask.LEAVE_NOTIFY_MASK;
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
 
         title = new Gtk.Label (title_name);
+        title.width_chars = 3;
         title.ellipsize = Pango.EllipsizeMode.END;
-        title.width_chars = 2;
-        title.hexpand = false;
 
         var edit_button = new Gtk.Button ();
         edit_button.image = new Gtk.Image.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
         edit_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         var button_revealer = new Gtk.Revealer ();
-        button_revealer.valign = Gtk.Align.CENTER;
         button_revealer.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
         button_revealer.add (edit_button);
 
-        var size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-        size_group.add_widget (edit_button);
-
         grid = new Gtk.Grid ();
+        grid.margin_top = 5;
         grid.add (title);
         grid.add (button_revealer);
 
         entry = new Gtk.Entry ();
-        entry.hexpand = false;
-        entry.halign = Gtk.Align.CENTER;
-        entry.width_chars = 2;
+        entry.width_chars = 3;
         var entry_style_context = entry.get_style_context ();
         entry_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
 
         stack = new Gtk.Stack ();
         stack.transition_type = Gtk.StackTransitionType.CROSSFADE;
-        stack.homogeneous = false;
+        stack.hhomogeneous = false;
         stack.add (grid);
         stack.add (entry);
         add (stack);
