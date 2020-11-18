@@ -348,11 +348,10 @@ namespace Rakugaki {
                         }
         
                         .dm-toolbar {
-                            background: @titlePrimary;
+                            background: @colorPrimary;
                             color: @titleSecondary;
                             box-shadow: none;
                             border: none;
-                            border-bottom: 1px solid alpha(black, 0.25);
                         }
         
                         .dm-toolbar .image-button {
@@ -365,7 +364,7 @@ namespace Rakugaki {
                             box-shadow: none;
                             border: none;
                             border-right: 1px solid alpha(black, 0.25);
-                            color: @iconColorPrimary;
+                            color: @titleSecondary;
                         }
         
                         .dm-tool {
@@ -381,7 +380,7 @@ namespace Rakugaki {
 
                         .dm-tool label {
                             margin-right: 5.9rem;
-                            color: @iconColorPrimary;
+                            color: @titleSecondary;
                         }
                           
                         .dm-tool image {
@@ -552,11 +551,10 @@ namespace Rakugaki {
                     }
     
                     .dm-toolbar {
-                        background: @titlePrimary;
+                        background: @colorPrimary;
                         color: @titleSecondary;
                         box-shadow: none;
                         border: none;
-                        border-bottom: 1px solid alpha(black, 0.25);
                     }
     
                     .dm-toolbar .image-button {
@@ -707,11 +705,10 @@ namespace Rakugaki {
                     }
 
                     .dm-toolbar {
-                        background: @titlePrimary;
+                        background: @colorPrimary;
                         color: @titleSecondary;
                         box-shadow: none;
                         border: none;
-                        border-bottom: 1px solid alpha(black, 0.25);
                     }
 
                     .dm-toolbar .image-button {
