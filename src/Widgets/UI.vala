@@ -271,8 +271,8 @@ namespace Rakugaki {
             eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			eraser_button.has_tooltip = true;
 			eraser_button.always_show_image = true;
-            eraser_button.tooltip_text = (_("Eraser"));
-            eraser_button.set_label (_("Erase things"));
+            eraser_button.tooltip_text = (_("Erase things"));
+            eraser_button.set_label (_("Eraser"));
 			eraser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			eraser_button.get_style_context ().add_class ("dm-tool");
 

@@ -149,7 +149,7 @@ namespace Rakugaki {
             var faux_titlebar_style_context = faux_titlebar.get_style_context ();
             faux_titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
             faux_titlebar_style_context.remove_class ("titlebar");
-            faux_titlebar.set_size_request (193, 38);
+            faux_titlebar.set_size_request (193, -1);
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
@@ -381,6 +381,7 @@ namespace Rakugaki {
 
                         .dm-tool label {
                             margin-right: 5.9rem;
+                            color: @iconColorPrimary;
                         }
                           
                         .dm-tool image {
@@ -584,6 +585,7 @@ namespace Rakugaki {
 
                     .dm-tool label {
                         margin-right: 5.9rem;
+                        color: @iconColorPrimary;
                     }
                       
                     .dm-tool image {
@@ -738,6 +740,7 @@ namespace Rakugaki {
 
                     .dm-tool label {
                         margin-right: 5.9rem;
+                        color: @iconColorPrimary;
                     }
                       
                     .dm-tool image {
