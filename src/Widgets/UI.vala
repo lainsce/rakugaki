@@ -22,14 +22,15 @@ namespace Rakugaki {
 		public signal void stroke_removed (uint n_strokes);
 	}
 
-	public class Widgets.UI : Gtk.VBox {
+	public class Widgets.UI : Gtk.Grid {
 		public MainWindow win;
 		public signal void stroke_added (double[] coordinates);
 		public signal void stroke_removed (uint n_strokes);
 		public DrawingArea da;
 		public EditableLabel line_thickness_label;
-		public Gtk.ColorButton line_color_button;
-		public Gtk.Grid box;
+        public Gtk.ColorButton line_color_button;
+        public Gtk.Grid line_box;
+		public Gtk.Grid sidebar_button_holder;
 
 		public List<Path> paths = new List<Path> ();
 		public Path current_path = null;
@@ -53,8 +54,8 @@ namespace Rakugaki {
 		public UI (MainWindow win) {
 			this.win = win;
 
-			da = new DrawingArea ();
-
+            da = new DrawingArea ();
+            da.expand = true;
 			da.add_events (Gdk.EventMask.BUTTON_PRESS_MASK |
 						   Gdk.EventMask.BUTTON_RELEASE_MASK |
 						   Gdk.EventMask.BUTTON_MOTION_MASK);
@@ -146,14 +147,6 @@ namespace Rakugaki {
 				return false;
 			});
 
-			box = new Gtk.Grid ();
-			box.orientation = Gtk.Orientation.VERTICAL;
-            box.margin = 12;
-            box.margin_top = 0;
-			box.vexpand = true;
-			box.set_size_request (90,-1);
-			box.get_style_context ().add_class ("dm-box");
-
 			line_color_button = new Gtk.ColorButton ();
 			line_color_button.height_request = 24;
 			line_color_button.width_request = 24;
@@ -200,15 +193,18 @@ namespace Rakugaki {
 				}
 			});
 
-			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-			line_thickness_box.pack_start (line_thickness_button);
-			line_thickness_box.pack_start (line_thickness_label);
+            line_box = new Gtk.Grid ();
+            line_box.margin = 6;
+            line_box.add (line_color_button);
+            line_box.add (line_thickness_button);
+			line_box.add (line_thickness_label);
 
 			var normal_button = new Gtk.Button ();
             normal_button.set_image (new Gtk.Image.from_icon_name ("line-cap-normal-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			normal_button.has_tooltip = true;
 			normal_button.always_show_image = true;
-			normal_button.tooltip_text = (_("Pen"));
+            normal_button.tooltip_text = (_("Drawing, simple pen"));
+            normal_button.set_label (_("Ink Pen"));
 			normal_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			normal_button.get_style_context ().add_class ("dm-tool");
 
@@ -224,7 +220,8 @@ namespace Rakugaki {
             halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-halftone-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			halftone_button.has_tooltip = true;
 			halftone_button.always_show_image = true;
-			halftone_button.tooltip_text = (_("Halftoner"));
+            halftone_button.tooltip_text = (_("Halftoner pen"));
+            halftone_button.set_label (_("Halftone"));
 			halftone_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			halftone_button.get_style_context ().add_class ("dm-tool");
 
@@ -240,7 +237,8 @@ namespace Rakugaki {
             dotter_button.set_image (new Gtk.Image.from_icon_name ("line-cap-dotter-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			dotter_button.has_tooltip = true;
 			dotter_button.always_show_image = true;
-			dotter_button.tooltip_text = (_("Dotter"));
+            dotter_button.tooltip_text = (_("Dots the canvas"));
+            dotter_button.set_label (_("Dot Pen"));
 			dotter_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			dotter_button.get_style_context ().add_class ("dm-tool");
 
@@ -256,7 +254,8 @@ namespace Rakugaki {
             plusser_button.set_image (new Gtk.Image.from_icon_name ("line-cap-plusser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			plusser_button.has_tooltip = true;
 			plusser_button.always_show_image = true;
-			plusser_button.tooltip_text = (_("Plus Pen"));
+            plusser_button.tooltip_text = (_("Patterns the canvas with plusses (+)"));
+            plusser_button.set_label (_("Plus Pen"));
 			plusser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			plusser_button.get_style_context ().add_class ("dm-tool");
 
@@ -272,7 +271,8 @@ namespace Rakugaki {
             eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			eraser_button.has_tooltip = true;
 			eraser_button.always_show_image = true;
-			eraser_button.tooltip_text = (_("Eraser"));
+            eraser_button.tooltip_text = (_("Eraser"));
+            eraser_button.set_label (_("Erase things"));
 			eraser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 			eraser_button.get_style_context ().add_class ("dm-tool");
 
@@ -284,30 +284,20 @@ namespace Rakugaki {
 				pen = false;
             });
 
-			var separator = new Gtk.Grid ();
-            separator.vexpand = true;
-            
-            var sidebar_header = new Gtk.Label (null);
-            sidebar_header.get_style_context ().add_class (Granite.STYLE_CLASS_H4_LABEL);
-            sidebar_header.use_markup = true;
-            sidebar_header.halign = Gtk.Align.START;
-            sidebar_header.margin_start = 3;
-            sidebar_header.margin_top = 6;
-            sidebar_header.label = _("TOOLS");
+            sidebar_button_holder = new Gtk.Grid ();
+			sidebar_button_holder.orientation = Gtk.Orientation.VERTICAL;
+            sidebar_button_holder.margin_start = 12;
+            sidebar_button_holder.margin_end = 11;
+            sidebar_button_holder.get_style_context ().add_class ("dm-box");
+			sidebar_button_holder.attach (normal_button, 0, 0, 1, 1);
+			sidebar_button_holder.attach (halftone_button, 0, 1, 1, 1);
+			sidebar_button_holder.attach (dotter_button, 0, 2, 1, 1);
+			sidebar_button_holder.attach (plusser_button, 0, 3, 1, 1);
+            sidebar_button_holder.attach (eraser_button, 0, 4, 1, 1);
 
-            box.attach (sidebar_header, 0, 0, 1, 1);
-			box.attach (normal_button, 0, 1, 1, 1);
-			box.attach (halftone_button, 0, 2, 1, 1);
-			box.attach (dotter_button, 0, 3, 1, 1);
-			box.attach (plusser_button, 0, 4, 1, 1);
-			box.attach (eraser_button, 0, 5, 1, 1);
-			box.attach (separator, 0, 6, 1, 1);
-			box.attach (line_color_button, 0, 7, 1, 1);
-			box.attach (line_thickness_box, 0, 8, 1, 1);
-
-			this.pack_start (da, true, true, 0);
+            this.add (da);
 			this.get_style_context ().add_class ("dm-grid");
-			show_all ();
+			this.show_all ();
 
 			da.stroke_added.connect ((coordinates) => {
 				stroke_added (coordinates);
@@ -373,8 +363,8 @@ namespace Rakugaki {
 					}
 				}
 				if (path.is_eraser) {
-					Gdk.cairo_set_source_rgba (cr, background_color);
-					cr.set_line_width (9);
+                    cr.set_line_width (9);
+                    cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
 					for (int i = 0; i < path.points.length (); i++) {
@@ -383,8 +373,8 @@ namespace Rakugaki {
 					cr.stroke ();
 				}
 				if (path.is_pen) {
-					Gdk.cairo_set_source_rgba (cr, line_color);
-					cr.set_line_width (line_thickness);
+                    cr.set_line_width (line_thickness);
+                    cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
 					for (int i = 0; i < path.points.length (); i++) {

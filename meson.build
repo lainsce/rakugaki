@@ -15,7 +15,6 @@ add_project_arguments(
 sources = files(
     'src/Application.vala',
     'src/MainWindow.vala',
-    'src/Constants/AppSettings.vala',
     'src/Widgets/UI.vala',
     'src/Widgets/EditableLabel.vala'
 )

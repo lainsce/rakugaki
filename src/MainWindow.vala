@@ -57,9 +57,7 @@ namespace Rakugaki {
                 application: application,
                 app: application,
                 icon_name: "com.github.lainsce.rakugaki",
-                title: "Rakugaki",
-                height_request: 585,
-                width_request: 755
+                title: "Rakugaki"
             );
 
             change_theme ();
@@ -93,17 +91,14 @@ namespace Rakugaki {
         }
 
         construct {
-            var settings = AppSettings.get_default ();
-            int x = settings.window_x;
-            int y = settings.window_y;
-            if (x != -1 && y != -1) {
-                this.move (x, y);
+            Hdy.init ();
+            int window_x, window_y, window_width, window_height;
+            Rakugaki.Application.gsettings.get ("window-position", "(ii)", out window_x, out window_y);
+            Rakugaki.Application.gsettings.get ("window-size", "(ii)", out window_width, out window_height);
+            if (window_x != -1 || window_y != -1) {
+                this.move (window_x, window_y);
             }
-            if (settings.window_maximize) {
-                this.maximize ();
-            } else {
-                this.unmaximize ();
-            }
+            this.resize (window_width, window_height);
 
             this.get_style_context ().add_class ("rounded");
             this.get_style_context ().add_class ("dm-window");
@@ -150,10 +145,11 @@ namespace Rakugaki {
             faux_titlebar = new Hdy.HeaderBar ();
             faux_titlebar.show_close_button = true;
             faux_titlebar.has_subtitle = false;
-            faux_titlebar.margin_top = faux_titlebar.margin_left = 6;
+            faux_titlebar.margin_top = faux_titlebar.margin_start = 6;
             var faux_titlebar_style_context = faux_titlebar.get_style_context ();
             faux_titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
             faux_titlebar_style_context.remove_class ("titlebar");
+            faux_titlebar.set_size_request (193, 38);
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             ui = new Widgets.UI (this);
@@ -187,10 +183,24 @@ namespace Rakugaki {
 				ui.da.queue_draw ();
             });
 
+            var sidebar_header = new Gtk.Label (null);
+            sidebar_header.get_style_context ().add_class (Granite.STYLE_CLASS_H4_LABEL);
+            sidebar_header.use_markup = true;
+            sidebar_header.halign = Gtk.Align.START;
+            sidebar_header.margin_start = 15;
+            sidebar_header.margin_top = 6;
+            sidebar_header.label = _("TOOLS");
+
+            var sidebar_separator = new Gtk.Grid ();
+            sidebar_separator.vexpand = true;
+
             sgrid = new Gtk.Grid ();
             sgrid.get_style_context ().add_class ("dm-sidebar");
             sgrid.attach (faux_titlebar, 0, 0, 1, 1);
-            sgrid.attach (ui.box, 0, 1, 1, 1);
+            sgrid.attach (sidebar_header, 0, 1, 1, 1);
+            sgrid.attach (ui.sidebar_button_holder, 0, 2, 1, 1);
+            sgrid.attach (sidebar_separator, 0, 3, 1, 1);
+            sgrid.attach (ui.line_box, 0, 4, 1, 1);
             sgrid.show_all ();
 
             main_frame_grid = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -224,6 +234,7 @@ namespace Rakugaki {
             Gtk.drag_dest_set (this,Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY);
             this.drag_data_received.connect(this.on_drag_data_received);
             this.add (leaflet);
+            this.set_size_request (360, 435);
             this.show_all ();
         }
 
@@ -359,12 +370,21 @@ namespace Rakugaki {
         
                         .dm-tool {
                             border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
-                            margin-bottom: 6px;
+                            padding: 8px;
+                            margin: 0;
                             border-radius: 8px;
                         }
         
                         .dm-tool:hover {
                             border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                        }
+
+                        .dm-tool label {
+                            margin-right: 5.9rem;
+                        }
+                          
+                        .dm-tool image {
+                            margin-left: 0.77rem;
                         }
 
                         .dm-box {
@@ -451,13 +471,12 @@ namespace Rakugaki {
         }
 
         public override bool delete_event (Gdk.EventAny event) {
-            int x, y;
-            get_position (out x, out y);
-
-            var settings = AppSettings.get_default ();
-            settings.window_x = x;
-            settings.window_y = y;
-            settings.window_maximize = is_maximized;
+            int root_w, root_h;
+            get_size (out root_w, out root_h);
+            Rakugaki.Application.gsettings.set ("window-size", "(ii)", root_w, root_h);
+            int root_x, root_y;
+            this.get_position (out root_x, out root_y);
+            Rakugaki.Application.gsettings.set ("window-position", "(ii)", root_x, root_y);
 
             if (ui.dirty) {
                 ui.clear ();
@@ -554,12 +573,21 @@ namespace Rakugaki {
     
                     .dm-tool {
                         border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
-                        margin-bottom: 6px;
+                        padding: 8px;
+                        margin: 0;
                         border-radius: 8px;
                     }
     
                     .dm-tool:hover {
                         border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                    }
+
+                    .dm-tool label {
+                        margin-right: 5.9rem;
+                    }
+                      
+                    .dm-tool image {
+                        margin-left: 0.77rem;
                     }
 
                     .dm-box {
@@ -699,12 +727,21 @@ namespace Rakugaki {
 
                     .dm-tool {
                         border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
-                        margin-bottom: 6px;
-                        border-radius: 8px;
+                        padding: 8px;
+                        margin: 0;
+                        border-radius: 7px;
                     }
 
                     .dm-tool:hover {
                         border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                    }
+
+                    .dm-tool label {
+                        margin-right: 5.9rem;
+                    }
+                      
+                    .dm-tool image {
+                        margin-left: 0.77rem;
                     }
 
                     .dm-box {

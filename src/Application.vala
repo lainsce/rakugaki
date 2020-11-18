@@ -20,11 +20,16 @@
 namespace Rakugaki {
     public class Application : Gtk.Application {
         public MainWindow window;
+        public static GLib.Settings gsettings;
         public static Granite.Settings grsettings;
 
         public Application () {
             Object (flags: ApplicationFlags.FLAGS_NONE,
             application_id: "com.github.lainsce.rakugaki");
+        }
+
+        static construct {
+            gsettings = new GLib.Settings ("com.github.lainsce.rakugaki");
         }
 
         construct {
