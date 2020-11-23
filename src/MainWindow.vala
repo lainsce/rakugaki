@@ -212,16 +212,11 @@ namespace Rakugaki {
             grid.attach (main_frame_grid, 1, 1, 1, 1);
             grid.show_all ();
 
-            separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
-            var separator_cx = separator.get_style_context ();
-            separator_cx.add_class ("vsep");
-
             leaflet = new Hdy.Leaflet () {
                 transition_type = Hdy.LeafletTransitionType.UNDER,
                 can_swipe_back = true
             };
             leaflet.add (sgrid);
-            leaflet.add (separator);
             leaflet.add (grid);
             leaflet.set_visible_child (grid);
             leaflet.show_all ();
