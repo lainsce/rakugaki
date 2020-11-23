@@ -355,7 +355,7 @@ namespace Rakugaki {
                         }
         
                         .dm-sidebar {
-                            background: mix (@colorSecondary, @colorPrimary, 0.85);
+                            background: mix (@colorSecondary, @colorPrimary, 0.90);
                             box-shadow: none;
                             border: none;
                             border-right: 1px solid alpha(black, 0.25);
@@ -363,14 +363,14 @@ namespace Rakugaki {
                         }
         
                         .dm-tool {
-                            border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                            border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                             padding: 8px;
                             margin: 0;
                             border-radius: 8px;
                         }
         
                         .dm-tool:hover {
-                            border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                            border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.90), 0.88);
                         }
 
                         .dm-tool label {
@@ -414,7 +414,7 @@ namespace Rakugaki {
                         }
         
                         .dm-clrbtn {
-                            background: mix (@colorSecondary, @colorPrimary, 0.85);
+                            background: mix (@colorSecondary, @colorPrimary, 0.90);
                             color: @textColorPrimary;
                             box-shadow: 0 1px transparent inset;
                             border: none;
@@ -558,7 +558,7 @@ namespace Rakugaki {
                     }
     
                     .dm-sidebar {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        background: mix (@colorSecondary, @colorPrimary, 0.90);
                         box-shadow: none;
                         border: none;
                         border-right: 1px solid alpha(black, 0.25);
@@ -566,14 +566,14 @@ namespace Rakugaki {
                     }
     
                     .dm-tool {
-                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                         padding: 8px;
                         margin: 0;
                         border-radius: 8px;
                     }
     
                     .dm-tool:hover {
-                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.90), 1.2);
                     }
 
                     .dm-tool label {
@@ -617,7 +617,7 @@ namespace Rakugaki {
                     }
     
                     .dm-clrbtn {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        background: mix (@colorSecondary, @colorPrimary, 0.90);
                         color: @textColorPrimary;
                         box-shadow: 0 1px transparent inset;
                         border: none;
@@ -712,7 +712,7 @@ namespace Rakugaki {
                     }
 
                     .dm-sidebar {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        background: mix (@colorSecondary, @colorPrimary, 0.90);
                         box-shadow: none;
                         border: none;
                         border-right: 1px solid alpha(black, 0.25);
@@ -720,14 +720,14 @@ namespace Rakugaki {
                     }
 
                     .dm-tool {
-                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.85);
+                        border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                         padding: 8px;
                         margin: 0;
                         border-radius: 7px;
                     }
 
                     .dm-tool:hover {
-                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.85), 1.2);
+                        border: 1px solid shade(mix (@colorSecondary, @colorPrimary, 0.90), 0.88);
                     }
 
                     .dm-tool label {
@@ -771,7 +771,7 @@ namespace Rakugaki {
                     }
 
                     .dm-clrbtn {
-                        background: mix (@colorSecondary, @colorPrimary, 0.85);
+                        background: mix (@colorSecondary, @colorPrimary, 0.90);
                         color: @textColorPrimary;
                         box-shadow: 0 1px transparent inset;
                         border: none;
