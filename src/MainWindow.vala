@@ -357,6 +357,12 @@ namespace Rakugaki {
                             color: @titleSecondary;
                             -gtk-icon-shadow: none;
                         }
+
+                        .dm-toolbar:backdrop .image-button,
+                        .dm-toolbar:backdrop .title,
+                        .dm-toolbar:backdrop .titlebutton {
+                            color: shade(@titleSecondary, 0.9);
+                        }
         
                         .dm-sidebar {
                             background: mix (@colorSecondary, @colorPrimary, 0.90);
@@ -564,6 +570,12 @@ namespace Rakugaki {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
                     }
+
+                    .dm-toolbar:backdrop .image-button,
+                    .dm-toolbar:backdrop .title,
+                    .dm-toolbar:backdrop .titlebutton {
+                        color: #CCC;
+                    }
     
                     .dm-sidebar {
                         background: mix (@colorSecondary, @colorPrimary, 0.90);
@@ -721,6 +733,12 @@ namespace Rakugaki {
                     .dm-toolbar .image-button {
                         color: @titleSecondary;
                         -gtk-icon-shadow: none;
+                    }
+
+                    .dm-toolbar:backdrop .image-button,
+                    .dm-toolbar:backdrop .title,
+                    .dm-toolbar:backdrop .titlebutton {
+                        color: #333;
                     }
 
                     .dm-sidebar {
