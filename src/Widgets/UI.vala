@@ -587,9 +587,9 @@ namespace Rakugaki {
 			}
 		}
 
-		public Gtk.FileChooserDialog create_file_chooser (string title,
+		public Gtk.FileChooserNative create_file_chooser (string title,
 		Gtk.FileChooserAction action) {
-			var chooser = new Gtk.FileChooserDialog (title, null, action);
+			var chooser = new Gtk.FileChooserNative (title, null, action, null, null);
 			chooser.add_button ("_Cancel", Gtk.ResponseType.CANCEL);
 			if (action == Gtk.FileChooserAction.OPEN) {
 				chooser.add_button ("_Open", Gtk.ResponseType.ACCEPT);
