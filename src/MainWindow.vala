@@ -310,8 +310,12 @@ namespace Rakugaki {
                         @define-color titlePrimary %s;
                         @define-color titleSecondary %s;
         
-                        window.unified {
-                            border-radius: 8px;
+                        window .csd:not(.popup):not(.menu) .titlebar,
+                        window:not(.popup):not(.menu) > decoration,
+                        window.unified,
+                        window.unified decoration,
+                        window.unified decoration-overlay {
+                        border-radius: 8px;
                         }
         
                         .title {
@@ -523,7 +527,11 @@ namespace Rakugaki {
                     @define-color titlePrimary %s;
                     @define-color titleSecondary %s;
     
-                    window.unified {
+                    window .csd:not(.popup):not(.menu) .titlebar,
+                    window:not(.popup):not(.menu) > decoration,
+                    window.unified,
+                    window.unified decoration,
+                    window.unified decoration-overlay {
                         border-radius: 8px;
                     }
     
@@ -687,7 +695,11 @@ namespace Rakugaki {
                     @define-color titlePrimary %s;
                     @define-color titleSecondary %s;
 
-                    window.unified {
+                    window .csd:not(.popup):not(.menu) .titlebar,
+                    window:not(.popup):not(.menu) > decoration,
+                    window.unified,
+                    window.unified decoration,
+                    window.unified decoration-overlay {
                         border-radius: 8px;
                     }
 
