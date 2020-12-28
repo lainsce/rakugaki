@@ -60,22 +60,18 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
 
         title = new Gtk.Label (title_name);
+        title.valign = Gtk.Align.CENTER;
         title.width_chars = 3;
         title.ellipsize = Pango.EllipsizeMode.END;
 
-        var edit_button = new Gtk.Button ();
-        edit_button.image = new Gtk.Image.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
-        edit_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        var button_revealer = new Gtk.Revealer ();
-        button_revealer.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
-        button_revealer.add (edit_button);
-
         grid = new Gtk.Grid ();
-        grid.margin_top = 5;
+        grid.row_homogeneous = true;
+        grid.column_homogeneous = true;
+        grid.valign = Gtk.Align.CENTER;
         grid.add (title);
-        grid.add (button_revealer);
 
         entry = new Gtk.Entry ();
+        entry.valign = Gtk.Align.CENTER;
         entry.width_chars = 3;
         var entry_style_context = entry.get_style_context ();
         entry_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -89,7 +85,6 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
 
         enter_notify_event.connect ((event) => {
             if (event.detail != Gdk.NotifyType.INFERIOR) {
-                button_revealer.set_reveal_child (true);
                 event.window.set_cursor (new Gdk.Cursor.from_name (Gdk.Display.get_default(), "text"));
             }
 
@@ -97,9 +92,6 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
         });
 
         leave_notify_event.connect ((event) => {
-            if (event.detail != Gdk.NotifyType.INFERIOR) {
-                button_revealer.set_reveal_child (false);
-            }
             event.window.set_cursor (new Gdk.Cursor.from_name (Gdk.Display.get_default(), "default"));
 
             return false;
@@ -108,10 +100,6 @@ public class Rakugaki.EditableLabel : Gtk.EventBox {
         button_release_event.connect ((event) => {
             editing = true;
             return false;
-        });
-
-        edit_button.clicked.connect (() => {
-            editing = true;
         });
 
         entry.activate.connect (() => {

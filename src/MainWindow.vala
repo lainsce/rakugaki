@@ -145,10 +145,9 @@ namespace Rakugaki {
             faux_titlebar = new Hdy.HeaderBar ();
             faux_titlebar.show_close_button = true;
             faux_titlebar.has_subtitle = false;
-            faux_titlebar.margin_top = faux_titlebar.margin_start = 6;
             var faux_titlebar_style_context = faux_titlebar.get_style_context ();
+            faux_titlebar_style_context.add_class ("dm-sidetoolbar");
             faux_titlebar_style_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            faux_titlebar_style_context.remove_class ("titlebar");
             faux_titlebar.set_size_request (193, -1);
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
@@ -330,6 +329,9 @@ namespace Rakugaki {
 
                         .dm-toolbar .image-button {
                             border-radius: 8px;
+                            border: none;
+                            background: none;
+                            box-shadow: none;
                         }
                         
                         .dm-toolbar .image-button image {
@@ -338,7 +340,7 @@ namespace Rakugaki {
                         
                         .dm-toolbar .image-button:focus,
                         .dm-toolbar .image-button:hover {
-                            background: shade(@base_color, 0.95);
+                            background: shade(@theme_bg_color, 0.95);
                         }
         
                         .dm-window {
@@ -351,6 +353,12 @@ namespace Rakugaki {
                             color: @titleSecondary;
                             box-shadow: none;
                             border-bottom: 1px solid alpha(black, 0.25);
+                        }
+
+                        .dm-sidetoolbar {
+                            background: none;
+                            box-shadow: none;
+                            border-bottom: none;
                         }
 
                         .dm-toolbar:backdrop {
@@ -379,8 +387,9 @@ namespace Rakugaki {
                         .dm-tool {
                             border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                             padding: 8px;
-                            margin: 0;
                             border-radius: 8px;
+                            background: none;
+                            box-shadow: none;
                         }
         
                         .dm-tool:hover {
@@ -388,12 +397,7 @@ namespace Rakugaki {
                         }
 
                         .dm-tool label {
-                            margin-right: 5.9rem;
                             color: @titleSecondary;
-                        }
-                          
-                        .dm-tool image {
-                            margin-left: 0.77rem;
                         }
 
                         .dm-box {
@@ -547,6 +551,9 @@ namespace Rakugaki {
 
                     .dm-toolbar .image-button {
                         border-radius: 8px;
+                        border: none;
+                        background: none;
+                        box-shadow: none;
                     }
                     
                     .dm-toolbar .image-button image {
@@ -555,7 +562,7 @@ namespace Rakugaki {
                     
                     .dm-toolbar .image-button:focus,
                     .dm-toolbar .image-button:hover {
-                        background: shade(@base_color, 0.95);
+                        background: shade(@theme_bg_color, 0.95);
                     }
     
                     .dm-window {
@@ -568,6 +575,12 @@ namespace Rakugaki {
                         color: @titleSecondary;
                         box-shadow: none;
                         border-bottom: 1px solid alpha(black, 0.25);
+                    }
+
+                    .dm-sidetoolbar {
+                        background: none;
+                        box-shadow: none;
+                        border-bottom: none;
                     }
 
                     .dm-toolbar:backdrop {
@@ -596,8 +609,9 @@ namespace Rakugaki {
                     .dm-tool {
                         border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                         padding: 8px;
-                        margin: 0;
                         border-radius: 8px;
+                        background: none;
+                        box-shadow: none;
                     }
     
                     .dm-tool:hover {
@@ -605,12 +619,7 @@ namespace Rakugaki {
                     }
 
                     .dm-tool label {
-                        margin-right: 5.9rem;
                         color: @iconColorPrimary;
-                    }
-                      
-                    .dm-tool image {
-                        margin-left: 0.77rem;
                     }
 
                     .dm-box {
@@ -715,6 +724,9 @@ namespace Rakugaki {
 
                     .dm-toolbar .image-button {
                         border-radius: 8px;
+                        border: none;
+                        background: none;
+                        box-shadow: none;
                     }
                     
                     .dm-toolbar .image-button image {
@@ -723,7 +735,7 @@ namespace Rakugaki {
                     
                     .dm-toolbar .image-button:focus,
                     .dm-toolbar .image-button:hover {
-                        background: shade(@base_color, 0.95);
+                        background: shade(@theme_bg_color, 0.95);
                     }
 
                     .dm-window {
@@ -736,6 +748,12 @@ namespace Rakugaki {
                         color: @titleSecondary;
                         box-shadow: none;
                         border-bottom: 1px solid alpha(black, 0.25);
+                    }
+
+                    .dm-sidetoolbar {
+                        background: none;
+                        box-shadow: none;
+                        border-bottom: none;
                     }
 
                     .dm-toolbar:backdrop {
@@ -764,8 +782,9 @@ namespace Rakugaki {
                     .dm-tool {
                         border: 1px solid mix (@colorSecondary, @colorPrimary, 0.90);
                         padding: 8px;
-                        margin: 0;
                         border-radius: 7px;
+                        background: none;
+                        box-shadow: none;
                     }
 
                     .dm-tool:hover {
@@ -773,12 +792,7 @@ namespace Rakugaki {
                     }
 
                     .dm-tool label {
-                        margin-right: 5.9rem;
                         color: @iconColorPrimary;
-                    }
-                      
-                    .dm-tool image {
-                        margin-left: 0.77rem;
                     }
 
                     .dm-box {
@@ -808,7 +822,8 @@ namespace Rakugaki {
 
                     .dm-text {
                         font-family: 'Cousine', Courier, monospace;
-                        font-size: 1.66em;
+                        font-size: 1.66rem;
+                        margin-top: 15px;
                         color: @textColorPrimary;
                     }
 

@@ -163,8 +163,8 @@ namespace Rakugaki {
 			var line_thickness_button = new Gtk.Button ();
 			line_thickness_button.set_image (new Gtk.Image.from_icon_name ("line-thickness-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
             line_thickness_button.has_tooltip = true;
-            line_thickness_button.margin_bottom = 3;
             line_thickness_button.tooltip_text = (_("Change Line Thickness"));
+            line_thickness_button.get_style_context ().add_class ("dm-tool");
 
 			line_thickness_label = new EditableLabel (line_thickness.to_string());
 			line_thickness_label.get_style_context ().add_class ("dm-text");
@@ -194,6 +194,8 @@ namespace Rakugaki {
 			});
 
             line_box = new Gtk.Grid ();
+            line_box.column_homogeneous = true;
+            line_box.row_homogeneous = true;
             line_box.margin = 6;
             line_box.add (line_color_button);
             line_box.add (line_thickness_button);
@@ -285,9 +287,11 @@ namespace Rakugaki {
             });
 
             sidebar_button_holder = new Gtk.Grid ();
+            sidebar_button_holder.column_homogeneous = true;
+            sidebar_button_holder.row_homogeneous = true;
 			sidebar_button_holder.orientation = Gtk.Orientation.VERTICAL;
             sidebar_button_holder.margin_start = 12;
-            sidebar_button_holder.margin_end = 11;
+            sidebar_button_holder.margin_end = 12;
             sidebar_button_holder.get_style_context ().add_class ("dm-box");
 			sidebar_button_holder.attach (normal_button, 0, 0, 1, 1);
 			sidebar_button_holder.attach (halftone_button, 0, 1, 1, 1);
