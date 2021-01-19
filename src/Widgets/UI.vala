@@ -3,15 +3,18 @@ namespace Rakugaki {
 		public double x;
 		public double y;
 		public Point (double x, double y) {
-			this.x = x;
-			this.y = y;
+			this.x = Math.fabs(x);
+			this.y = Math.fabs(y);
 		}
 	}
 
 	public class Path {
 		public List<Point> points = null;
+		public bool is_dotter {get; set; default=false;}
 		public bool is_halftone {get; set; default=false;}
 		public bool is_eraser {get; set; default=false;}
+		public bool is_plusser {get; set; default=false;}
+		public bool is_pen {get; set; default=false;}
 	}
 
 	public class DrawingArea : Gtk.DrawingArea {
@@ -19,19 +22,21 @@ namespace Rakugaki {
 		public signal void stroke_removed (uint n_strokes);
 	}
 
-	public class Widgets.UI : Gtk.VBox {
+	public class Widgets.UI : Gtk.Grid {
 		public MainWindow win;
 		public signal void stroke_added (double[] coordinates);
 		public signal void stroke_removed (uint n_strokes);
 		public DrawingArea da;
 		public EditableLabel line_thickness_label;
-		public Gtk.ColorButton line_color_button;
+        public Gtk.ColorButton line_color_button;
+        public Gtk.Grid line_box;
+		public Gtk.Grid sidebar_button_holder;
 
 		public List<Path> paths = new List<Path> ();
 		public Path current_path = null;
 
 		private int ratio = 25;
-		public int line_thickness = 1;
+		public int line_thickness = 5;
 
 		public Gdk.RGBA line_color;
 		public Gdk.RGBA grid_main_dot_color;
@@ -39,15 +44,18 @@ namespace Rakugaki {
 		public Gdk.RGBA background_color;
 
 		public bool dirty {get; set;}
-		public bool see_grid {get; set; default=true;}
+		public bool see_grid {get; set; default=false;}
+		public bool pen {get; set; default=true;}
 		public bool halftone {get; set; default=false;}
+		public bool dotter {get; set; default=false;}
+		public bool plusser {get; set; default=false;}
 		public bool eraser {get; set; default=false;}
 
 		public UI (MainWindow win) {
 			this.win = win;
 
-			da = new DrawingArea ();
-
+            da = new DrawingArea ();
+            da.expand = true;
 			da.add_events (Gdk.EventMask.BUTTON_PRESS_MASK |
 						   Gdk.EventMask.BUTTON_RELEASE_MASK |
 						   Gdk.EventMask.BUTTON_MOTION_MASK);
@@ -59,46 +67,59 @@ namespace Rakugaki {
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
+				if (dotter) {
+					current_path = new Path ();
+					current_path.is_dotter = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
+				if (plusser) {
+					current_path = new Path ();
+					current_path.is_plusser = true;
+					current_path.points.append (new Point (e.x, e.y));
+					paths.append (current_path);
+				}
 				if (eraser) {
 					current_path = new Path ();
 					current_path.is_eraser = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
-				if (!halftone && !eraser) {
+				if (pen) {
 					current_path = new Path ();
-					current_path.is_halftone = false;
+					current_path.is_pen = true;
 					current_path.points.append (new Point (e.x, e.y));
 					paths.append (current_path);
 				}
 				dirty = true;
 				return false;
 			});
-	
+
 			da.button_release_event.connect ((e) => {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
-				double[] coordinates = new double[current_path.points.length () * 2];
-				int i = 0;
-				foreach (var point in current_path.points) {
-					coordinates[i] = point.x / (double)allocation.width;
-					coordinates[i + 1] = point.y / (double)allocation.height;
-				}
-				stroke_added (coordinates);
-	
+
+				double x = e.x.clamp ((double) allocation.x,
+									  (double) (allocation.x + allocation.width));
+				double y = e.y.clamp ((double) allocation.y,
+									  (double) (allocation.y + allocation.height));
+				current_path.points.append (new Point (x, y));
+
+				da.queue_draw ();
+
 				current_path = null;
 
 				return false;
 			});
-	
+
 			da.motion_notify_event.connect ((e) => {
 				Gtk.Allocation allocation;
 				get_allocation (out allocation);
-	
-				double x = e.x.clamp ((double)allocation.x,
-										  (double)(allocation.x + allocation.width));
-				double y = e.y.clamp ((double)allocation.y,
-										  (double)(allocation.y + allocation.height));
+
+				double x = e.x.clamp ((double) allocation.x,
+									  (double) (allocation.x + allocation.width));
+				double y = e.y.clamp ((double) allocation.y,
+									  (double) (allocation.y + allocation.height));
 				Point last = current_path.points.last ().data;
 				double dx = Math.fabs(last.x - x);
 				double dy = Math.fabs(last.y - y);
@@ -120,79 +141,34 @@ namespace Rakugaki {
 
 				return false;
 			});
-	
+
 			da.draw.connect ((c) => {
 				main_draw (c);
 				return false;
 			});
 
-			var actionbar = new Gtk.ActionBar ();
-			actionbar.get_style_context ().add_class ("dm-actionbar");
-			
-			var new_button = new Gtk.Button ();
-			new_button.has_tooltip = true;
-			new_button.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			new_button.tooltip_text = (_("New file"));
-			
-			new_button.clicked.connect ((e) => {
-				clear ();
-			});
-			
-			actionbar.pack_start (new_button);
-			
-			var save_button = new Gtk.Button ();
-			save_button.set_image (new Gtk.Image.from_icon_name ("document-save-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			save_button.has_tooltip = true;
-			save_button.tooltip_text = (_("Save file"));
-			
-			save_button.clicked.connect ((e) => {
-				try {
-					save ();
-				} catch (Error e) {
-					warning ("Unexpected error during save: " + e.message);
-				}
-			});
-			
-			actionbar.pack_start (save_button);
-			
-			var undo_button = new Gtk.Button ();
-			undo_button.set_image (new Gtk.Image.from_icon_name ("edit-undo-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			undo_button.has_tooltip = true;
-			undo_button.tooltip_text = (_("Undo Last Line"));
-			
-			undo_button.clicked.connect ((e) => {
-				undo ();
-				current_path = new Path ();
-				da.queue_draw ();
-			});
-			
-			actionbar.pack_start (undo_button);
-			
 			line_color_button = new Gtk.ColorButton ();
-			line_color_button.margin_start = 6;
 			line_color_button.height_request = 24;
 			line_color_button.width_request = 24;
 			line_color_button.show_editor = true;
 			line_color_button.get_style_context ().add_class ("dm-clrbtn");
 			line_color_button.get_style_context ().remove_class ("color");
 			line_color_button.tooltip_text = (_("Line Color"));
-			actionbar.pack_start (line_color_button);
-			
+
 			line_color_button.color_set.connect ((e) => {
 				line_color = line_color_button.rgba;
 				da.queue_draw ();
 			});
-			
+
 			var line_thickness_button = new Gtk.Button ();
 			line_thickness_button.set_image (new Gtk.Image.from_icon_name ("line-thickness-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			line_thickness_button.has_tooltip = true;
-			line_thickness_button.tooltip_text = (_("Change Line Thickness"));
+            line_thickness_button.has_tooltip = true;
+            line_thickness_button.tooltip_text = (_("Change Line Thickness"));
+            line_thickness_button.get_style_context ().add_class ("dm-tool");
+
 			line_thickness_label = new EditableLabel (line_thickness.to_string());
 			line_thickness_label.get_style_context ().add_class ("dm-text");
-			line_thickness_label.valign = Gtk.Align.CENTER;
-			line_thickness_label.hexpand = false;
-			line_thickness_label.margin_top = 3;
-			
+
 			line_thickness_button.clicked.connect ((e) => {
 				if (line_thickness < 50) {
 					line_thickness++;
@@ -204,7 +180,7 @@ namespace Rakugaki {
 					da.queue_draw ();
 				}
 			});
-			
+
 			line_thickness_label.changed.connect (() => {
 				if (int.parse(line_thickness_label.title.get_label ()) > 50 || int.parse(line_thickness_label.title.get_label ()) < 1) {
 					line_thickness = 1;
@@ -216,73 +192,123 @@ namespace Rakugaki {
 					da.queue_draw ();
 				}
 			});
-			
-			var line_thickness_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
-			line_thickness_box.pack_start (line_thickness_button);
-			line_thickness_box.pack_start (line_thickness_label);
-			
-			actionbar.pack_start (line_thickness_box);
-			
-			var halftone_button = new Gtk.Button ();
-            halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			halftone_button.has_tooltip = true;
-			halftone_button.tooltip_text = (_("Change Pen Type"));
 
-			halftone_button.clicked.connect ((e) => {
+            line_box = new Gtk.Grid ();
+            line_box.column_homogeneous = true;
+            line_box.row_homogeneous = true;
+            line_box.margin = 6;
+            line_box.add (line_color_button);
+            line_box.add (line_thickness_button);
+			line_box.add (line_thickness_label);
+
+			var normal_button = new Gtk.Button ();
+            normal_button.set_image (new Gtk.Image.from_icon_name ("line-cap-normal-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			normal_button.has_tooltip = true;
+			normal_button.always_show_image = true;
+            normal_button.tooltip_text = (_("Drawing, simple pen"));
+            normal_button.set_label (_("Ink Pen"));
+			normal_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			normal_button.get_style_context ().add_class ("dm-tool");
+
+			normal_button.clicked.connect ((e) => {
 				eraser = false;
-				if (halftone) {
-					halftone = false;
-				} else {
-					halftone = true;
-				}
+				halftone = false;
+				dotter = false;
+				plusser = false;
+				pen = true;
             });
 
-			actionbar.pack_end (halftone_button);
+			var halftone_button = new Gtk.Button ();
+            halftone_button.set_image (new Gtk.Image.from_icon_name ("line-cap-halftone-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			halftone_button.has_tooltip = true;
+			halftone_button.always_show_image = true;
+            halftone_button.tooltip_text = (_("Halftoner pen"));
+            halftone_button.set_label (_("Halftone"));
+			halftone_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			halftone_button.get_style_context ().add_class ("dm-tool");
+
+			halftone_button.clicked.connect ((e) => {
+				halftone = true;
+				dotter = false;
+				eraser = false;
+				plusser = false;
+				pen = false;
+			});
 			
+			var dotter_button = new Gtk.Button ();
+            dotter_button.set_image (new Gtk.Image.from_icon_name ("line-cap-dotter-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			dotter_button.has_tooltip = true;
+			dotter_button.always_show_image = true;
+            dotter_button.tooltip_text = (_("Dots the canvas"));
+            dotter_button.set_label (_("Dot Pen"));
+			dotter_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			dotter_button.get_style_context ().add_class ("dm-tool");
+
+			dotter_button.clicked.connect ((e) => {
+				dotter = true;
+				halftone = false;
+				eraser = false;
+				plusser = false;
+				pen = false;
+			});
+			
+			var plusser_button = new Gtk.Button ();
+            plusser_button.set_image (new Gtk.Image.from_icon_name ("line-cap-plusser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+			plusser_button.has_tooltip = true;
+			plusser_button.always_show_image = true;
+            plusser_button.tooltip_text = (_("Patterns the canvas with plusses (+)"));
+            plusser_button.set_label (_("Plus Pen"));
+			plusser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			plusser_button.get_style_context ().add_class ("dm-tool");
+
+			plusser_button.clicked.connect ((e) => {
+				plusser = true;
+				halftone = false;
+				eraser = false;
+				dotter = false;
+				pen = false;
+            });
+
 			var eraser_button = new Gtk.Button ();
             eraser_button.set_image (new Gtk.Image.from_icon_name ("eraser-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
 			eraser_button.has_tooltip = true;
-			eraser_button.tooltip_text = (_("Eraser"));
+			eraser_button.always_show_image = true;
+            eraser_button.tooltip_text = (_("Erase things"));
+            eraser_button.set_label (_("Eraser"));
+			eraser_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			eraser_button.get_style_context ().add_class ("dm-tool");
 
 			eraser_button.clicked.connect ((e) => {
+				eraser = true;
+				dotter = false;
 				halftone = false;
-				if (eraser) {
-					eraser = false;
-				} else {
-					eraser = true;
-				}
+				plusser = false;
+				pen = false;
             });
 
-            actionbar.pack_end (eraser_button);
-			
-			var see_grid_button = new Gtk.Button ();
-			see_grid_button.set_image (new Gtk.Image.from_icon_name ("grid-dots-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-			see_grid_button.has_tooltip = true;
-			see_grid_button.tooltip_text = (_("Show/Hide Grid"));
-			
-			see_grid_button.clicked.connect ((e) => {
-				if (see_grid == true) {
-					see_grid = false;
-				} else if (see_grid == false) {
-					see_grid = true;
-				}
-				da.queue_draw ();
-			});
-			
-			actionbar.pack_end (see_grid_button);
-			
-			this.pack_end (actionbar, false, false, 0);
-			this.pack_start (da, true, true, 0);
+            sidebar_button_holder = new Gtk.Grid ();
+            sidebar_button_holder.column_homogeneous = true;
+            sidebar_button_holder.row_homogeneous = true;
+			sidebar_button_holder.orientation = Gtk.Orientation.VERTICAL;
+            sidebar_button_holder.margin_start = 12;
+            sidebar_button_holder.margin_end = 12;
+            sidebar_button_holder.get_style_context ().add_class ("dm-box");
+			sidebar_button_holder.attach (normal_button, 0, 0, 1, 1);
+			sidebar_button_holder.attach (halftone_button, 0, 1, 1, 1);
+			sidebar_button_holder.attach (dotter_button, 0, 2, 1, 1);
+			sidebar_button_holder.attach (plusser_button, 0, 3, 1, 1);
+            sidebar_button_holder.attach (eraser_button, 0, 4, 1, 1);
+
+            this.add (da);
 			this.get_style_context ().add_class ("dm-grid");
-			this.margin = 1;
-			show_all ();
+			this.show_all ();
 
 			da.stroke_added.connect ((coordinates) => {
-					stroke_added (coordinates);
-				});
+				stroke_added (coordinates);
+			});
 			da.stroke_removed.connect ((n_strokes) => {
-					stroke_removed (n_strokes);
-				});
+				stroke_removed (n_strokes);
+			});
 		}
 
 		public void main_draw (Cairo.Context cr) {
@@ -290,78 +316,73 @@ namespace Rakugaki {
 			get_allocation (out allocation);
 			Cairo.ImageSurface sf2 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr2 = new Cairo.Context (sf2);
-			draws (cr2);
-
 			Cairo.ImageSurface sf3 = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			Cairo.Context cr3 = new Cairo.Context (sf3);
-			draw_grid (cr3);
-
 			cr.set_source_surface (cr2.get_target (), 0, 0);
+			draws (cr2);
 			cr.rectangle (0, 0, allocation.width, allocation.height);
 			cr.paint ();
 			cr.set_source_surface (cr3.get_target (), 0, 0);
+			draw_grid (cr3);
 			cr.rectangle (0, 0, allocation.width, allocation.height);
 			cr.paint ();
 		}
 
 		public void draws (Cairo.Context cr) {
-			cr.set_antialias (Cairo.Antialias.SUBPIXEL);
+			cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
+        	cr.paint ();
+			cr.set_antialias (Cairo.Antialias.NONE);
 			cr.set_fill_rule (Cairo.FillRule.EVEN_ODD);
 			cr.set_line_cap (Cairo.LineCap.ROUND);
 			cr.set_line_join (Cairo.LineJoin.ROUND);
+			Cairo.ImageSurface p_ht = halftone_pattern ();
+			Cairo.ImageSurface p_dt = dotter_pattern ();
+			Cairo.ImageSurface p_pt = plusser_pattern ();
 			foreach (var path in paths) {
 				if (path.is_halftone) {
-					Gdk.cairo_set_source_rgba (cr, line_color);
-					cr.set_line_width (9);
-					foreach (var point in path.points.next) {
-						cr.rectangle (point.x, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 9, point.y, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 2, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 5, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 8, point.y + 3, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 3, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 6, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 9, point.y + 6, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 2, point.y + 9, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 5, point.y + 9, 1, 1);
-						cr.fill ();
-						cr.rectangle (point.x + 8, point.y + 9, 1, 1);
-						cr.fill ();
+					cr.set_line_width (1);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(Math.floor(path.points.nth_data(i).x - (line_thickness / 2)) / 10) * 10;
+						int y = (int) Math.round(Math.floor(path.points.nth_data(i).y - (line_thickness / 2)) / 12) * 12;
+						cr.mask_surface (p_ht, x, y);
 					}
-					cr.stroke ();
+				}
+				if (path.is_dotter) {
+					cr.set_line_width (1);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(Math.floor(path.points.nth_data(i).x - (line_thickness / 2)) / 11) * 11;
+						int y = (int) Math.round(Math.floor(path.points.nth_data(i).y - (line_thickness / 2)) / 11) * 11;
+						cr.mask_surface (p_dt, x, y);
+					}
+				}
+				if (path.is_plusser) {
+					cr.set_line_width (1);
+					cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+					for (int i = 0; i < path.points.length (); i++) {
+						int x = (int) Math.round(Math.floor(path.points.nth_data(i).x - (line_thickness / 2)) / 11) * 11;
+						int y = (int) Math.round(Math.floor(path.points.nth_data(i).y - (line_thickness / 2)) / 11) * 11;
+						cr.mask_surface (p_pt, x, y);
+					}
 				}
 				if (path.is_eraser) {
-					Gdk.cairo_set_source_rgba (cr, background_color);
-					cr.set_line_width (9);
+                    cr.set_line_width (9);
+                    cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 1);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
-					foreach (var point in path.points.next) {
-						cr.line_to (point.x, point.y);
+					for (int i = 0; i < path.points.length (); i++) {
+						cr.line_to (path.points.nth_data(i).x, path.points.nth_data(i).y);
 					}
 					cr.stroke ();
 				}
-				if (!path.is_eraser && !path.is_halftone) {
-					Gdk.cairo_set_source_rgba (cr, line_color);
-					cr.set_line_width (line_thickness);
+				if (path.is_pen) {
+                    cr.set_line_width (line_thickness);
+                    cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
 					Point first = path.points.first ().data;
 					cr.move_to (first.x, first.y);
-					foreach (var point in path.points.next) {
-						cr.line_to (point.x, point.y);
+					for (int i = 0; i < path.points.length (); i++) {
+						cr.line_to (path.points.nth_data(i).x, path.points.nth_data(i).y);
 					}
 					cr.stroke ();
 				}
@@ -383,7 +404,7 @@ namespace Rakugaki {
 					for (j = 0; j <= h / ratio; j++) {
 						if (i % 4 == 0 && j % 4 == 0) {
 							cr.set_source_rgba (grid_main_dot_color.red, grid_main_dot_color.green, grid_main_dot_color.blue, 1);
-							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.4, 0, 2*Math.PI);
+							cr.arc ((i+1)*ratio, (j+1)*ratio, 1.5, 0, 2*Math.PI);
 							cr.fill ();
 						} else {
 							cr.set_source_rgba (grid_dot_color.red, grid_dot_color.green, grid_dot_color.blue, 1);
@@ -395,8 +416,93 @@ namespace Rakugaki {
 			}
 		}
 
+		private Cairo.ImageSurface halftone_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 9, 12);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int x, y;
+			for (x = 0; x <= 9; x++) {
+				for (y = 0; y <= 12; y++) {
+					if ((x % 3 == 0 && y % 6 == 0) || (x % 3 == 2 && y % 6 == 3)) {
+						p_cr.close_path ();
+						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+						p_cr.rectangle (x, y, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					} else {
+						p_cr.close_path ();
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (x, y, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
+		}
+
+		private Cairo.ImageSurface dotter_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 10, 10);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int i, j;
+			for (i = 0; i <= 10; i++) {
+				for (j = 0; j <= 10; j++) {
+					if ((i % Math.floor(ratio/2) == 0 && j % Math.floor(ratio/2) == 0) ||
+						(i % Math.floor(ratio/2) == 6 && j % Math.floor(ratio/2) == 6)) {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					} else {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
+		}
+
+		private Cairo.ImageSurface plusser_pattern () {
+			Cairo.ImageSurface p = new Cairo.ImageSurface (Cairo.Format.ARGB32, 8, 8);
+			Cairo.Context p_cr = new Cairo.Context (p);
+			int i, j;
+			for (i = 1; i <= 8; i++) {
+				for (j = 1; j <= 8; j++) {
+					if (i % 4 == 0) {
+						p_cr.new_path ();
+                        p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+                        p_cr.rectangle (i, j, 1, 1);
+                        p_cr.fill ();
+                        p_cr.stroke ();
+					} else if (j % 4 == 0) {
+                        p_cr.new_path ();
+                        p_cr.set_source_rgba (line_color.red, line_color.green, line_color.blue, 1);
+                        p_cr.rectangle (i, j, 1, 1);
+                        p_cr.fill ();
+                        p_cr.stroke ();
+                    } else {
+						p_cr.new_path ();
+						p_cr.set_source_rgba (background_color.red, background_color.green, background_color.blue, 0);
+						p_cr.rectangle (i, j, 1, 1);
+						p_cr.fill ();
+						p_cr.stroke ();
+					}
+				}
+			}
+			Cairo.Pattern pn = new Cairo.Pattern.for_surface (p);
+			pn.set_extend (Cairo.Extend.REPEAT);
+			return p;
+		}
+
 		// IO Section
-		private void clear () {
+		public void clear () {
 			var dialog = new Dialog ();
 			dialog.transient_for = win;
 
@@ -457,9 +563,9 @@ namespace Rakugaki {
 		public void save () throws Error {
 			debug ("Save as button pressed.");
 			var file = display_save_dialog ();
-			
+
 			string path = file.get_path ();
-			
+
 			if (file == null) {
 				debug ("User cancelled operation. Aborting.");
 			} else {
@@ -476,7 +582,7 @@ namespace Rakugaki {
 				Cairo.Context cr2 = new Cairo.Context (sf2);
 				Gdk.cairo_set_source_rgba (cr2, line_color);
 				draws (cr2);
-	
+
 				c.set_source_surface (cr2.get_target (), 0, 0);
 				c.rectangle (0, 0, allocation.width, allocation.height);
 				c.paint ();
@@ -484,29 +590,22 @@ namespace Rakugaki {
 				file = null;
 			}
 		}
-		
-		public Gtk.FileChooserDialog create_file_chooser (string title,
+
+		public Gtk.FileChooserNative create_file_chooser (string title,
 		Gtk.FileChooserAction action) {
-			var chooser = new Gtk.FileChooserDialog (title, null, action);
-			chooser.add_button ("_Cancel", Gtk.ResponseType.CANCEL);
-			if (action == Gtk.FileChooserAction.OPEN) {
-				chooser.add_button ("_Open", Gtk.ResponseType.ACCEPT);
-			} else if (action == Gtk.FileChooserAction.SAVE) {
-				chooser.add_button ("_Save", Gtk.ResponseType.ACCEPT);
-				chooser.set_do_overwrite_confirmation (true);
-			}
+			var chooser = new Gtk.FileChooserNative (title, null, action, null, null);
 			var filter1 = new Gtk.FileFilter ();
 			filter1.set_filter_name (_("PNG files"));
 			filter1.add_pattern ("*.png");
 			chooser.add_filter (filter1);
-			
+
 			var filter = new Gtk.FileFilter ();
 			filter.set_filter_name (_("All files"));
 			filter.add_pattern ("*");
 			chooser.add_filter (filter);
 			return chooser;
 		}
-		
+
 		public File display_save_dialog () {
 			var chooser = create_file_chooser (_("Save file"),
 			Gtk.FileChooserAction.SAVE);
@@ -516,7 +615,7 @@ namespace Rakugaki {
 			chooser.destroy();
 			return file;
 		}
-		
+
 		#if VALA_0_42
 		protected bool match_keycode (uint keyval, uint code) {
 			#else
@@ -530,7 +629,7 @@ namespace Rakugaki {
 						return true;
 					}
 				}
-				
+
 				return false;
 			}
 	}
